@@ -1,4 +1,5 @@
 // ── capitaldepas.com · Data & Shared Hooks ────────────────────────────────────
+// fix: JSX syntax corrected
 //
 // Los datos de proyectos vienen de Google Sheets (vía /api/projects).
 // Mientras cargan, mostramos los placeholders definidos abajo.
