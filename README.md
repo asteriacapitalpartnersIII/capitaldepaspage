@@ -1,6 +1,7 @@
 # capitaldepas.com
 
 Sitio de departamentos en preventa y venta. Código hosted en GitHub, desplegado en Vercel, datos en Google Sheets, fotos en este mismo repo.
+<!-- deployed -->
 
 ---
 
