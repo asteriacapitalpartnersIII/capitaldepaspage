@@ -1,0 +1,9 @@
+{
+  "name": "capitaldepas",
+  "version": "0.1.0",
+  "private": true,
+  "description": "capitaldepas.com — Departamentos en preventa y venta en México",
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>capitaldepas.com — Departamentos en preventa y venta en México</title>
+  <meta name="description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más. Proyectos cuidadosamente seleccionados y asesoría personalizada." />
+  <meta name="theme-color" content="#F5F3EE" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="capitaldepas.com — Departamentos en preventa y venta en México" />
+  <meta property="og:description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://capitaldepas.com" />
+  <meta property="og:locale" content="es_MX" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #F5F3EE;
+      color: #0E0E0C;
+      cursor: none;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #F0EDE7; }
+    ::-webkit-scrollbar-thumb { background: rgba(21,80,232,0.25); border-radius: 100px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(21,80,232,0.5); }
+    ::selection { background: rgba(21,80,232,0.15); color: #0E0E0C; }
+
+    input, textarea, select, button, a { cursor: none; }
+
+    @keyframes shimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes scrollLine {
+      0%   { transform: scaleY(0); transform-origin: top; }
+      50%  { transform: scaleY(1); transform-origin: top; }
+      51%  { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-12px); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width:0; height:0; }
+    input[type="range"]::-moz-range-thumb { width:0; height:0; border:none; }
+    textarea { font-family: 'DM Sans', sans-serif; }
+    :focus-visible { outline: 2px solid rgba(21,80,232,0.4); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="js/data.jsx"></script>
+  <script type="text/babel" src="js/cursor.jsx"></script>
+  <script type="text/babel" src="js/nav.jsx"></script>
+  <script type="text/babel" src="js/hero.jsx"></script>
+  <script type="text/babel" src="js/listings.jsx"></script>
+  <script type="text/babel" src="js/project-detail.jsx"></script>
+  <script type="text/babel" src="js/sections.jsx"></script>
+  <script type="text/babel" src="js/calculator.jsx"></script>
+  <script type="text/babel" src="js/map-section.jsx"></script>
+  <script type="text/babel" src="js/blog.jsx"></script>
+  <script type="text/babel" src="js/contact.jsx"></script>
+  <script type="text/babel" src="js/footer.jsx"></script>
+  <script type="text/babel" src="js/app.jsx"></script>
+</body>
+</html>
