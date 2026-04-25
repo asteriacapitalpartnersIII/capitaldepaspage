@@ -1,10 +1,10 @@
-// ── capitaldepas.com · API /api/projects ─────────────────────────────────────
+// ── capitaldepas.com · API /api/projects ─────────────────────────────
 //
 // Lee la hoja de Google (dos pestañas: "proyectos" y "blog") y la convierte
 // a JSON. El sitio llama a este endpoint al cargar.
 //
 // La hoja debe estar compartida como "Cualquier persona con el enlace — lector".
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────────
 
 const SHEET_ID = '1Ynfoj4WLF2yaCfe5QN3ToywfsDNwVq2U2LvDqz4smX4';
 
@@ -30,40 +30,47 @@ function parseCSV(text) {
               }
       }
       if (cell.length || row.length) { row.push(cell); rows.push(row); }
-      return rows.filter(r => r.some(c => c && c.trim()));
+      return rows;
 }
 
-// ── Normaliza las filas: si alguna celda tiene tabs embebidos, expande esa
-//    celda a múltiples columnas (caso: sheet tiene todo en columna A como TSV)
+// ── Normaliza filas: si una celda contiene una fila completa pegada en col A,
+//    la expande a múltiples columnas. Casos manejados:
+//      1) Tabs embebidos (\t)        → paste TSV típico
+//      2) Runs de 2+ espacios         → paste donde tabs se convirtieron en espacios
+//    Sólo aplica el split si las DEMÁS columnas de esa fila están vacías, para no
+//    romper celdas legítimas que contengan espacios.
 function normalizeRows(rows) {
       if (rows.length < 2) return rows;
-
-  // Detectar si filas de datos tienen tabs en la primera celda
-  // (el header puede estar bien pero los datos pegados en col A como TSV)
-  const dataRows = rows.slice(1);
-      const hasTabbedData = dataRows.some(r => r[0] && r[0].includes('\t'));
-      const headerHasTabs = rows[0][0] && rows[0][0].includes('\t');
-
-  if (!hasTabbedData && !headerHasTabs) return rows;
-
-  // Expandir cada fila cuya celda 0 contenga tabs
-  return rows.map(row => {
-          if (row[0] && row[0].includes('\t')) {
-                    return row[0].split('\t').map(c => c.trim());
-          }
-          return row;
-  });
+      const SPLIT_RE = /\t+| {2,}/;
+      const looksBlobbed = (row) => {
+              if (!row || !row[0] || typeof row[0] !== 'string') return false;
+              if (!SPLIT_RE.test(row[0])) return false;
+              const restNonEmpty = row.slice(1).some(c => c && String(c).trim().length > 0);
+              return !restNonEmpty;
+      };
+      const dataRows = rows.slice(1);
+      const hasBlobbedData = dataRows.some(looksBlobbed);
+      const headerBlobbed = looksBlobbed(rows[0]);
+      if (!hasBlobbedData && !headerBlobbed) return rows;
+      return rows.map(row => {
+              if (looksBlobbed(row)) {
+                        return row[0].split(SPLIT_RE).map(c => c.trim());
+              }
+              return row;
+      });
 }
 
 const toNumber = (s) => {
-      const n = parseFloat(String(s ?? '').replace(/[^0-9.\-]/g, ''));
+      const n = parseFloat(String(s ?? '').replace(/[^\d.\-]/g, ''));
       return Number.isFinite(n) ? n : 0;
 };
+const toFloat = (s) => {
+      const n = parseFloat(String(s ?? '').trim());
+      return Number.isFinite(n) ? n : null;
+};
 const toList = (s) => String(s ?? '').split(',').map(x => x.trim()).filter(Boolean);
-const yesish = (s) => /^(si|sí|yes|true|1|x)$/i.test(String(s ?? '').trim());
+const yesish = (s) => /^(s[ií]|yes|true|1|x)$/i.test(String(s ?? '').trim());
 
-// Resuelve rutas de fotos. Si el valor ya es una URL completa, se deja.
-// Si es un nombre de archivo, se prefija con /images/projects/.
 const resolvePhoto = (p) => {
       if (!p) return null;
       if (/^https?:\/\//i.test(p)) return p;
@@ -71,7 +78,6 @@ const resolvePhoto = (p) => {
       return `/images/projects/${p}`;
 };
 
-// ── Mapeo de fila → proyecto ───────────────────────────────────────────────────
 function rowToProject(headers, row, i) {
       const get = (name) => {
               const idx = headers.indexOf(name);
@@ -80,8 +86,9 @@ function rowToProject(headers, row, i) {
       const slug = get('slug');
       if (!slug) return null;
       const price = toNumber(get('precio'));
-      const rawPriceStr = get('precio_texto');
-      const priceStr = rawPriceStr || (price ? `$${(price / 1_000_000).toFixed(1)}M` : '');
+      const priceStr = get('precio_texto') || (price ? `$${(price/1e6).toFixed(1)}M` : '');
+      const lat = toFloat(get('lat'));
+      const lng = toFloat(get('lng'));
       return {
               id: slug,
               slug,
@@ -101,6 +108,9 @@ function rowToProject(headers, row, i) {
               photos: toList(get('fotos')).map(resolvePhoto).filter(Boolean),
               accentHue: toNumber(get('hue')) || 220,
               featured: yesish(get('destacado')),
+              lat,
+              lng,
+              hasCoords: lat !== null && lng !== null,
       };
 }
 
@@ -128,20 +138,57 @@ function rowToPost(headers, row, i) {
 async function fetchSheet(sheetName) {
       try {
               const r = await fetch(urlFor(sheetName));
-              if (!r.ok) return [];
+              if (!r.ok) return null;
               const text = await r.text();
               const rawRows = parseCSV(text);
               const rows = normalizeRows(rawRows);
-              if (rows.length < 2) return [];
-              const headers = rows[0].map(h => h.trim().toLowerCase());
+              if (rows.length < 2) return null;
+              const headers = rows[0].map(h => (h ?? '').trim());
               return { headers, rows: rows.slice(1) };
       } catch {
-              return [];
+              return null;
       }
 }
 
+const ZONE_TO_CITY = {
+      'cdmx': 'CDMX',
+      'polanco': 'CDMX',
+      'reforma': 'CDMX',
+      'reforma centro': 'CDMX',
+      'condesa': 'CDMX',
+      'roma': 'CDMX',
+      'cancun': 'Cancún',
+      'cancún': 'Cancún',
+      'zona hotelera': 'Cancún',
+      'los cabos': 'Los Cabos',
+      'los-cabos': 'Los Cabos',
+      'cabo san lucas': 'Los Cabos',
+      'san jose del cabo': 'Los Cabos',
+      'oaxaca': 'Oaxaca',
+};
+function zoneToCity(zone) {
+      const z = String(zone || '').toLowerCase().trim();
+      if (!z) return '';
+      if (ZONE_TO_CITY[z]) return ZONE_TO_CITY[z];
+      return z.charAt(0).toUpperCase() + z.slice(1);
+}
+
+function buildStats(properties) {
+      const developers = new Set();
+      const cities = new Set();
+      for (const p of properties) {
+              if (p.developer) developers.add(p.developer.trim().toLowerCase());
+              const city = zoneToCity(p.zone);
+              if (city) cities.add(city);
+      }
+      return {
+              projects: properties.length,
+              developers: developers.size,
+              cities: cities.size,
+      };
+}
+
 module.exports = async (req, res) => {
-      // Cache de 5 minutos en el edge; CDN revalida en background
       res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.setHeader('Access-Control-Allow-Origin', '*');
@@ -156,8 +203,9 @@ module.exports = async (req, res) => {
               const posts = blog && blog.rows
                 ? blog.rows.map((r, i) => rowToPost(blog.headers, r, i)).filter(Boolean)
                         : [];
-              res.status(200).json({ properties, posts, count: properties.length });
+              const stats = buildStats(properties);
+              res.status(200).json({ properties, posts, stats, count: properties.length });
       } catch (err) {
-              res.status(500).json({ error: String(err), properties: [], posts: [] });
+              res.status(500).json({ error: String(err), properties: [], posts: [], stats: { projects: 0, developers: 0, cities: 0 } });
       }
 };
