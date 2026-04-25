@@ -120,9 +120,9 @@ const HeroCinematic = ({ setPage, searchQuery, setSearchQuery, searchType, setSe
 
         {/* Stats */}
         <div style={{ display:'flex', gap:48, marginTop:36 }}>
-          <HeroStat target={24} suffix="+" label="Proyectos" />
-          <HeroStat target={6} label="Ciudades" />
-          <HeroStat target={12} suffix="+" label="Desarrolladores" />
+          <HeroStat target={(typeof STATS !== 'undefined' ? STATS.projects : 0)} label="Proyectos" />
+          <HeroStat target={(typeof STATS !== 'undefined' ? STATS.cities : 0)} label="Ciudades" />
+          <HeroStat target={(typeof STATS !== 'undefined' ? STATS.developers : 0)} label="Desarrolladores" />
         </div>
       </div>
 
