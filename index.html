@@ -7,16 +7,43 @@
   <meta name="description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más. Proyectos cuidadosamente seleccionados y asesoría personalizada." />
   <meta name="theme-color" content="#F5F3EE" /><!-- v1 -->
 
+  <!-- SEO -->
+  <link rel="canonical" href="https://capitaldepas.com/" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <meta name="author" content="capitaldepas.com" />
+
   <!-- Open Graph -->
   <meta property="og:title" content="capitaldepas.com — Departamentos en preventa y venta en México" />
   <meta property="og:description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más." /> 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://capitaldepas.com" />
   <meta property="og:locale" content="es_MX" />
+  <meta property="og:site_name" content="capitaldepas.com" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="capitaldepas.com — Departamentos en preventa y venta en México" />
+  <meta name="twitter:description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más." />
+
+  <!-- Structured data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "capitaldepas.com",
+    "url": "https://capitaldepas.com",
+    "description": "Departamentos en preventa y venta en México, cuidadosamente seleccionados.",
+    "areaServed": { "@type": "Country", "name": "México" }
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+
+  <!-- Mapbox GL JS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,11 +86,36 @@
       to   { transform: rotate(360deg); }
     }
 
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width:0; height:0; }
-    input[type="range"]::-moz-range-thumb { width:0; height:0; border:none; }
+    body, button, input, select, textarea { font-family: 'DM Sans', system-ui, sans-serif; }
+    h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
     textarea { font-family: 'DM Sans', sans-serif; }
     :focus-visible { outline: 2px solid rgba(21,80,232,0.4); outline-offset: 2px; }
+
+    .mapboxgl-canvas { cursor: none !important; }
+    .mapboxgl-popup-content {
+      font-family: 'DM Sans', sans-serif;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+    .mapboxgl-ctrl-attrib { font-size: 10px; }
   </style>
+
+  <script>
+    // Carga el token de Mapbox desde /api/config (variable de entorno en Vercel).
+    // Esto evita commitear el token y permite rotarlo sin redeploy de código.
+    (function() {
+      window.MAPBOX_TOKEN_READY = new Promise(function(resolve) {
+        fetch('/api/config').then(function(r){ return r.ok ? r.json() : {}; }).then(function(cfg){
+          if (cfg && cfg.mapboxToken) {
+            window.MAPBOX_TOKEN = cfg.mapboxToken;
+            if (typeof mapboxgl !== 'undefined') mapboxgl.accessToken = cfg.mapboxToken;
+          }
+          resolve(window.MAPBOX_TOKEN || null);
+        }).catch(function(){ resolve(null); });
+      });
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>
