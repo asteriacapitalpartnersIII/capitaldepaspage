@@ -85,20 +85,14 @@ const ProjectDetail = ({ prop, setPage }) => {
                 </div>
               )}
               {activeTab==='ubicación' && (
-                <div>
-                  <div style={{ height:240, borderRadius:16, background:'#EEF2FF', border:'1.5px solid rgba(21,80,232,0.1)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>
-                    <div style={{ textAlign:'center', color:'#9E9890' }}>
-                      <svg width="40" height="40" viewBox="0 0 24 28" fill="rgba(21,80,232,0.3)" style={{marginBottom:10}}><path d="M12 0C7.6 0 4 3.6 4 8c0 6 8 18 8 18s8-12 8-18c0-4.4-3.6-8-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg>
-                      <div style={{ fontFamily:'DM Sans', fontSize:12, letterSpacing:2, textTransform:'uppercase', color:'#9E9890' }}>Mapa Interactivo</div>
-                      <div style={{ fontFamily:'DM Sans', fontSize:12, marginTop:4, color:'#1550E8', fontWeight:600 }}>{prop.location}</div>
-                    </div>
-                  </div>
-                  <div style={{ fontFamily:'DM Sans', fontSize:14, color:'#6B6560', lineHeight:1.75 }}>
-                    Ubicado en <strong style={{color:'#0E0E0C'}}>{prop.location}</strong>, a minutos de centros comerciales, restaurantes, transporte público y servicios esenciales. Zona con alta plusvalía y demanda creciente.
-                  </div>
+              <div>
+                <MiniMapa prop={prop} height={340} />
+                <div style={{ fontFamily:'DM Sans', fontSize:14, color:'#6B6560', lineHeight:1.75, marginTop:18 }}>
+                  Ubicado en <strong style={{color:'#0E0E0C'}}>{prop.location}</strong>. {prop.hasCoords ? 'Acerca el mapa para ver el punto exacto del desarrollo.' : 'Aún no tenemos coordenadas precisas para este desarrollo.'}
                 </div>
-              )}
-              {activeTab==='financiamiento' && (
+              </div>
+            )}
+            {activeTab==='financiamiento' && (
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
                   {[{title:'Crédito Bancario',icon:'🏦',desc:'BBVA, Santander, HSBC, Banorte. Hasta 90% del valor a 20 años.'},{title:'Infonavit',icon:'🏠',desc:'Compatible con Infonavit directo o cofinavit con banco.'},{title:'Preventa con descuento',icon:'📉',desc:'Hasta 15% de descuento sobre precio de lista comprando en preventa.'},{title:'Financiamiento propio',icon:'📋',desc:'El desarrollador ofrece esquemas de pago a meses sin intereses.'}].map(item=>(
                     <div key={item.title} style={{ background:'#fff', border:'1.5px solid rgba(0,0,0,0.07)', borderRadius:14, padding:'18px', boxShadow:'0 2px 10px rgba(0,0,0,0.04)' }}>
