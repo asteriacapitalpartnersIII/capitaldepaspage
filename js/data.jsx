@@ -68,6 +68,9 @@ const useDataVersion = () => {
     React.useEffect(() => _subscribeToDataChanges(bump), []);
 };
 
+// STATS global, llenado al cargar /api/projects (con fallback razonable)
+let STATS = { projects: PROPERTIES.length, developers: 1, cities: 1 };
+
 fetch('/api/projects')
   .then(r => r.ok ? r.json() : null)
   .then(data => {
@@ -79,9 +82,61 @@ fetch('/api/projects')
                 BLOG_POSTS.length = 0;
                 BLOG_POSTS.push(...data.posts);
         }
+        if (data && data.stats) {
+                STATS = {
+                        projects: data.stats.projects || PROPERTIES.length,
+                        developers: data.stats.developers || 1,
+                        cities: data.stats.cities || 1,
+                };
+        } else {
+                STATS = computeStats(PROPERTIES);
+        }
         _notifyDataChange();
   })
-  .catch(() => { /* mantener placeholders si no hay API aún */ });
+  .catch(() => { STATS = computeStats(PROPERTIES); _notifyDataChange(); });
+
+// Helper: calcula stats en cliente cuando el API no los provee
+function computeStats(props) {
+        const devs = new Set();
+        const cities = new Set();
+        for (const p of props) {
+                if (p.developer) devs.add(p.developer.trim().toLowerCase());
+                const z = (p.zone || '').toLowerCase().trim();
+                const cityMap = {
+                        'cdmx':'CDMX','polanco':'CDMX','reforma':'CDMX','reforma centro':'CDMX',
+                        'condesa':'CDMX','roma':'CDMX',
+                        'cancun':'Cancún','cancún':'Cancún','zona hotelera':'Cancún',
+                        'los cabos':'Los Cabos','los-cabos':'Los Cabos',
+                };
+                const c = cityMap[z] || (z ? z[0].toUpperCase()+z.slice(1) : '');
+                if (c) cities.add(c);
+        }
+        return { projects: props.length, developers: Math.max(1, devs.size), cities: Math.max(1, cities.size) };
+}
+
+// ── Mapbox geocoding fallback (cuando un proyecto no tiene lat/lng) ──────────
+async function geocodeMissing(props) {
+        const token = window.MAPBOX_TOKEN;
+        if (!token) return;
+        const missing = props.filter(p => !p.hasCoords && p.location);
+        for (const p of missing) {
+                try {
+                        const q = encodeURIComponent(p.location + ', México');
+                        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=${token}&limit=1&country=mx`;
+                        const r = await fetch(url);
+                        if (!r.ok) continue;
+                        const j = await r.json();
+                        const c = j.features && j.features[0] && j.features[0].center;
+                        if (c && c.length === 2) {
+                                p.lng = c[0]; p.lat = c[1]; p.hasCoords = true;
+                        }
+                } catch {}
+        }
+        _notifyDataChange();
+}
+// Lanzamos el geocoding después del primer fetch
+setTimeout(() => geocodeMissing(PROPERTIES), 800);
+
 
 // ── Shared Hooks ───────────────────────────────────────────────────────────────
 const useScrollReveal = (threshold = 0.12) => {
