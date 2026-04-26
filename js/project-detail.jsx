@@ -8,6 +8,11 @@ const ProjectDetail = ({ prop, setPage }) => {
   const [ref, vis] = useScrollReveal(0.05);
 
   if (!prop) return null;
+  if (window.useProjectSeo) window.useProjectSeo(prop);
+  if (window.usePageViewTracking) window.usePageViewTracking('project', { slug: prop && prop.slug, name: prop && prop.name });
+  React.useEffect(() => {
+    try { window.capdepasTrack && window.capdepasTrack('view_content', { content_type: 'product', content_ids: [prop.slug || prop.id], content_name: prop.name, value: prop.price || 0, currency: 'MXN' }); } catch(e){}
+  }, [prop && (prop.slug || prop.id)]);
 
   const tabs = ['overview','amenidades','ubicación','financiamiento'];
   const tabLabel = { overview:'Descripción', amenidades:'Amenidades', ubicación:'Ubicación', financiamiento:'Financiamiento' };
@@ -122,12 +127,12 @@ const ProjectDetail = ({ prop, setPage }) => {
                 ))}
               </div>
 
-              <button ref={magBtn} onClick={()=>setPage('contact')} style={{ width:'100%', background:'#1550E8', border:'none', borderRadius:12, padding:'14px', fontFamily:'DM Sans', fontSize:15, fontWeight:700, color:'#fff', cursor:'pointer', marginBottom:10, transition:'all 0.25s', boxShadow:'0 4px 16px rgba(21,80,232,0.3)', letterSpacing:0.3 }}
+              <button ref={magBtn} onClick={()=>{ try{window.capdepasTrack && window.capdepasTrack('lead', { content_name: prop.name, content_ids:[prop.slug||prop.id], value: prop.price||0, currency:'MXN', source:'request_info_button' });}catch(e){} setPage('contact'); }} style={{ width:'100%', background:'#1550E8', border:'none', borderRadius:12, padding:'14px', fontFamily:'DM Sans', fontSize:15, fontWeight:700, color:'#fff', cursor:'pointer', marginBottom:10, transition:'all 0.25s', boxShadow:'0 4px 16px rgba(21,80,232,0.3)', letterSpacing:0.3 }}
                 onMouseEnter={e=>{e.target.style.background='#0B37C2';e.target.style.transform='scale(1.02)';}}
                 onMouseLeave={e=>{e.target.style.background='#1550E8';e.target.style.transform='scale(1)';}}
                 data-cursor="pointer">Solicitar información</button>
 
-              <a href={"https://wa.me/525512345678?text="+encodeURIComponent("Hola, me interesa el proyecto "+prop.name)} target="_blank" rel="noreferrer"
+              <a href={"https://wa.me/525512345678?text="+encodeURIComponent("Hola, me interesa el proyecto "+prop.name)} target="_blank" rel="noreferrer" onClick={()=>{try{window.capdepasTrack && window.capdepasTrack("contact", { method:"whatsapp", content_name: prop.name, content_ids:[prop.slug||prop.id] });}catch(e){}}}
                 style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:10, background:'rgba(37,211,102,0.1)', border:'1.5px solid rgba(37,211,102,0.25)', borderRadius:12, padding:'12px', fontFamily:'DM Sans', fontSize:14, fontWeight:700, color:'#16a34a', cursor:'pointer', textDecoration:'none', transition:'all 0.2s' }}
                 onMouseEnter={e=>e.currentTarget.style.background='rgba(37,211,102,0.18)'}
                 onMouseLeave={e=>e.currentTarget.style.background='rgba(37,211,102,0.1)'}
