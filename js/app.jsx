@@ -16,6 +16,11 @@ const App = () => {
 
   // Re-renderizar cuando los datos de Google Sheets se hayan cargado
   useDataVersion();
+  // SEO/ads tracking on logical page change
+  React.useEffect(() => {
+    if (page !== 'project' && window.resetSeo) window.resetSeo();
+    try { window.capdepasTrack && window.capdepasTrack('page_view', { page: page }); } catch(e){}
+  }, [page]);
 
   React.useEffect(()=>{ localStorage.setItem('capitaldepas_page',page); },[page]);
 
