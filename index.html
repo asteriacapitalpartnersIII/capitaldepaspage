@@ -1,44 +1,104 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>capitaldepas.com — Departamentos en preventa y venta en México</title>
-  <meta name="description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más. Proyectos cuidadosamente seleccionados y asesoría personalizada." />
-  <meta name="theme-color" content="#F5F3EE" /><!-- v1 -->
 
-  <!-- SEO -->
-  <link rel="canonical" href="https://capitaldepas.com/" />
-  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <title>capitaldepas.com — Departamentos en preventa y venta en México | CDMX, Cancún, Los Cabos</title>
+  <meta name="description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más. Desarrolladores verificados, hasta 20% por debajo del valor final, asesoría gratuita y crédito Infonavit/Fovissste/bancario." />
+  <meta name="keywords" content="departamentos en preventa, departamentos en venta, depas CDMX, depas Cancún, depas Los Cabos, preventa CDMX, comprar depa, inversión inmobiliaria México, desarrollos verificados, capitaldepas" />
   <meta name="author" content="capitaldepas.com" />
+  <meta name="theme-color" content="#F5F3EE" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="bingbot" content="index, follow" />
+  <meta name="geo.region" content="MX" />
+  <meta name="geo.placename" content="México" />
+  <meta name="language" content="es-MX" />
 
-  <!-- Open Graph -->
+  <!-- Canonical + alternates -->
+  <link rel="canonical" href="https://capitaldepas.com/" />
+  <link rel="alternate" hreflang="es-mx" href="https://capitaldepas.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://capitaldepas.com/" />
+
+  <!-- Open Graph / Facebook / Meta Ads -->
   <meta property="og:title" content="capitaldepas.com — Departamentos en preventa y venta en México" />
-  <meta property="og:description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más." /> 
+  <meta property="og:description" content="Desarrollos verificados en CDMX, Cancún, Los Cabos y más. Asesoría gratuita y hasta 20% por debajo del valor final." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://capitaldepas.com" />
-  <meta property="og:locale" content="es_MX" />
+  <meta property="og:url" content="https://capitaldepas.com/" />
   <meta property="og:site_name" content="capitaldepas.com" />
+  <meta property="og:locale" content="es_MX" />
+  <meta property="og:image" content="https://capitaldepas.com/images/og-cover.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="capitaldepas.com — Departamentos en preventa en México" />
 
-  <!-- Twitter Card -->
+  <!-- Twitter Card / X -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="capitaldepas.com — Departamentos en preventa y venta en México" />
-  <meta name="twitter:description" content="Departamentos en preventa y venta en CDMX, Cancún, Los Cabos y más." />
+  <meta name="twitter:description" content="Desarrollos verificados en CDMX, Cancún, Los Cabos y más." />
+  <meta name="twitter:image" content="https://capitaldepas.com/images/og-cover.jpg" />
 
-  <!-- Structured data: Organization -->
+  <!-- JSON-LD: Organization + WebSite + RealEstateAgent + FAQPage -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "capitaldepas.com",
-    "url": "https://capitaldepas.com",
-    "description": "Departamentos en preventa y venta en México, cuidadosamente seleccionados.",
-    "areaServed": { "@type": "Country", "name": "México" }
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://capitaldepas.com/#org",
+        "name": "capitaldepas.com",
+        "url": "https://capitaldepas.com/",
+        "logo": "https://capitaldepas.com/images/logo.png",
+        "description": "Plataforma mexicana de departamentos en preventa y venta. Desarrolladores verificados y asesoría personalizada.",
+        "areaServed": { "@type": "Country", "name": "México" },
+        "sameAs": []
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://capitaldepas.com/#website",
+        "url": "https://capitaldepas.com/",
+        "name": "capitaldepas.com",
+        "publisher": { "@id": "https://capitaldepas.com/#org" },
+        "inLanguage": "es-MX",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://capitaldepas.com/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "RealEstateAgent",
+        "@id": "https://capitaldepas.com/#agent",
+        "name": "capitaldepas.com",
+        "url": "https://capitaldepas.com/",
+        "areaServed": [
+          { "@type": "City", "name": "Ciudad de México" },
+          { "@type": "City", "name": "Cancún" },
+          { "@type": "City", "name": "Los Cabos" }
+        ],
+        "knowsLanguage": "es-MX"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://capitaldepas.com/#faq",
+        "mainEntity": [
+          { "@type": "Question", "name": "¿Qué es una preventa?", "acceptedAnswer": { "@type": "Answer", "text": "Una preventa es la venta de un inmueble antes de que sea construido o terminado. Permite adquirirlo a un precio más bajo y personalizar acabados." } },
+          { "@type": "Question", "name": "¿Cómo sé que el desarrollador es confiable?", "acceptedAnswer": { "@type": "Answer", "text": "En capitaldepas verificamos la reputación, trayectoria y documentación legal de cada desarrollador antes de publicar su proyecto." } },
+          { "@type": "Question", "name": "¿Puedo comprar con Infonavit o crédito bancario?", "acceptedAnswer": { "@type": "Answer", "text": "Sí. Muchos de nuestros proyectos son compatibles con Infonavit, Fovissste e hipotecas bancarias." } },
+          { "@type": "Question", "name": "¿Tiene costo usar capitaldepas.com?", "acceptedAnswer": { "@type": "Answer", "text": "No. Para compradores capitaldepas es completamente gratuito. La comisión la pagan los desarrolladores." } }
+        ]
+      }
+    ]
   }
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.mapbox.com" />
+  <link rel="dns-prefetch" href="https://connect.facebook.net" />
+  <link rel="dns-prefetch" href="https://analytics.tiktok.com" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
 
   <!-- Mapbox GL JS -->
@@ -48,83 +108,150 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body {
-      background: #F5F3EE;
-      color: #0E0E0C;
-      cursor: none;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
+    body { background: #F5F3EE; color: #0E0E0C; cursor: none; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: #F0EDE7; }
     ::-webkit-scrollbar-thumb { background: rgba(21,80,232,0.25); border-radius: 100px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(21,80,232,0.5); }
     ::selection { background: rgba(21,80,232,0.15); color: #0E0E0C; }
-
     input, textarea, select, button, a { cursor: none; }
-
-    @keyframes shimmer {
-      0% { background-position: 0% center; }
-      100% { background-position: 200% center; }
-    }
-    @keyframes scrollLine {
-      0%   { transform: scaleY(0); transform-origin: top; }
-      50%  { transform: scaleY(1); transform-origin: top; }
-      51%  { transform: scaleY(1); transform-origin: bottom; }
-      100% { transform: scaleY(0); transform-origin: bottom; }
-    }
-    @keyframes floatY {
-      0%, 100% { transform: translateY(0px); }
-      50%       { transform: translateY(-12px); }
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes spinSlow {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
+    @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+    @keyframes scrollLine { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform: scaleY(1); transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+    @keyframes floatY { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     body, button, input, select, textarea { font-family: 'DM Sans', system-ui, sans-serif; }
     h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
     textarea { font-family: 'DM Sans', sans-serif; }
     :focus-visible { outline: 2px solid rgba(21,80,232,0.4); outline-offset: 2px; }
-
     .mapboxgl-canvas { cursor: none !important; }
-    .mapboxgl-popup-content {
-      font-family: 'DM Sans', sans-serif;
-      border-radius: 12px;
-      padding: 14px 16px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-    }
+    .mapboxgl-popup-content { font-family: 'DM Sans', sans-serif; border-radius: 12px; padding: 14px 16px; box-shadow: 0 12px 32px rgba(0,0,0,0.12); }
     .mapboxgl-ctrl-attrib { font-size: 10px; }
+    /* Contenido SEO oculto pero accesible para crawlers */
+    .seo-only { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
   </style>
 
+  <!-- Carga de config (token Mapbox + IDs de pixels) y bootstrap de tracking -->
   <script>
-    // Carga el token de Mapbox desde /api/config (variable de entorno en Vercel).
-    // Esto evita commitear el token y permite rotarlo sin redeploy de código.
     (function() {
       window.MAPBOX_TOKEN_READY = new Promise(function(resolve) {
         fetch('/api/config').then(function(r){ return r.ok ? r.json() : {}; }).then(function(cfg){
-          if (cfg && cfg.mapboxToken) {
+          cfg = cfg || {};
+          if (cfg.mapboxToken) {
             window.MAPBOX_TOKEN = cfg.mapboxToken;
             if (typeof mapboxgl !== 'undefined') mapboxgl.accessToken = cfg.mapboxToken;
           }
+          window.__PIXELS = cfg.pixels || {};
+          // Carga de pixels de ads (solo si hay ID configurado)
+          try { window.__bootPixels && window.__bootPixels(window.__PIXELS); } catch (e) {}
           resolve(window.MAPBOX_TOKEN || null);
         }).catch(function(){ resolve(null); });
       });
+
+      // dataLayer para Google Tag Manager / GA4
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); }
+      window.gtag = gtag;
+
+      // Helper de tracking unificado: dispara en Meta + TikTok + Google Ads + dataLayer
+      window.capdepasTrack = function(eventName, params) {
+        params = params || {};
+        try { window.dataLayer.push(Object.assign({ event: eventName }, params)); } catch (e) {}
+        try { if (window.fbq) window.fbq('track', mapMetaEvent(eventName), params); } catch (e) {}
+        try { if (window.ttq) window.ttq.track(mapTikTokEvent(eventName), params); } catch (e) {}
+        try { if (window.gtag && window.__PIXELS && window.__PIXELS.googleAds) {
+          window.gtag('event', eventName, Object.assign({ send_to: window.__PIXELS.googleAds }, params));
+        } } catch (e) {}
+      };
+      function mapMetaEvent(name) {
+        // Mapeo a eventos estandar de Meta
+        const map = { 'page_view':'PageView','view_content':'ViewContent','lead':'Lead','contact':'Contact','search':'Search','submit':'SubmitApplication' };
+        return map[name] || name;
+      }
+      function mapTikTokEvent(name) {
+        const map = { 'page_view':'Pageview','view_content':'ViewContent','lead':'SubmitForm','contact':'Contact','search':'Search','submit':'SubmitForm' };
+        return map[name] || name;
+      }
+
+      // Bootstrap pixels de ads
+      window.__bootPixels = function(p) {
+        if (!p) return;
+        // Meta Pixel
+        if (p.meta) {
+          (function(f,b,e,v,n,t,s){
+            if(f.fbq) return; n=f.fbq=function(){ n.callMethod ? n.callMethod.apply(n,arguments) : n.queue.push(arguments) };
+            if(!f._fbq) f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0'; n.queue=[];
+            t=b.createElement(e); t.async=!0; t.src=v; s=b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t,s);
+          })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+          window.fbq('init', p.meta);
+          window.fbq('track', 'PageView');
+        }
+        // TikTok Pixel
+        if (p.tiktok) {
+          (function (w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = w[t] = w[t] || [];
+            ttq.methods = ['page','track','identify','instances','debug','on','off','once','ready','alias','group','enableCookie','disableCookie','holdConsent','revokeConsent','grantConsent'];
+            ttq.setAndDefer = function (t,e) { t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments,0))) } };
+            for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+            ttq.instance = function (t) { for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++) ttq.setAndDefer(e, ttq.methods[n]); return e };
+            ttq.load = function (e, n) {
+              var r = 'https://analytics.tiktok.com/i18n/pixel/events.js', o = n && n.partner;
+              ttq._i = ttq._i || {}; ttq._i[e] = []; ttq._i[e]._u = r;
+              ttq._t = ttq._t || {}; ttq._t[e] = +new Date; ttq._o = ttq._o || {}; ttq._o[e] = n || {};
+              n = document.createElement('script'); n.type = 'text/javascript'; n.async = !0; n.src = r + '?sdkid=' + e + '&lib=' + t;
+              e = document.getElementsByTagName('script')[0]; e.parentNode.insertBefore(n, e);
+            };
+            ttq.load(p.tiktok);
+            ttq.page();
+          })(window, document, 'ttq');
+        }
+        // Google Tag (GA4 + Google Ads via gtag.js)
+        if (p.ga4 || p.googleAds) {
+          var firstId = p.ga4 || p.googleAds;
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(firstId);
+          document.head.appendChild(s);
+          window.gtag('js', new Date());
+          if (p.ga4) window.gtag('config', p.ga4, { send_page_view: true });
+          if (p.googleAds && p.googleAds !== p.ga4) window.gtag('config', p.googleAds);
+        }
+        // Google Tag Manager (opcional)
+        if (p.gtm) {
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+            var f=d.getElementsByTagName(s)[0], j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
+            j.async=true; j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl; f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer', p.gtm);
+        }
+      };
     })();
   </script>
 </head>
 <body>
   <div id="root"></div>
 
+  <!-- Contenido SEO/LLM-friendly: visible para crawlers aunque React aun no haya hidratado -->
+  <noscript>
+    <main>
+      <h1>capitaldepas.com — Departamentos en preventa y venta en México</h1>
+      <p>Plataforma mexicana de departamentos en preventa y venta. Desarrollos verificados en CDMX, Cancún, Los Cabos y otras ciudades. Asesoría personalizada gratuita para el comprador.</p>
+      <h2>Lo que encontrarás</h2>
+      <ul>
+        <li>Departamentos en preventa con descuentos de hasta 20% sobre el valor de mercado final.</li>
+        <li>Departamentos en venta listos para entrega.</li>
+        <li>Calculadora de crédito hipotecario, Infonavit y Fovissste.</li>
+        <li>Mapa interactivo con la ubicación de cada desarrollo.</li>
+      </ul>
+      <p>Visita <a href="/sitemap.xml">sitemap.xml</a> para la lista completa de proyectos.</p>
+    </main>
+  </noscript>
+
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
-
   <script type="text/babel" src="js/data.jsx"></script>
+  <script type="text/babel" src="js/seo.jsx"></script>
   <script type="text/babel" src="js/cursor.jsx"></script>
   <script type="text/babel" src="js/nav.jsx"></script>
   <script type="text/babel" src="js/hero.jsx"></script>
