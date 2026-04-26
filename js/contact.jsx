@@ -9,7 +9,7 @@ const Contact = () => {
   const [ref, vis] = useScrollReveal(0.05);
 
   const update = (k,v) => setForm(f=>({...f,[k]:v}));
-  const submit = (e) => { e.preventDefault(); if(form.privacy) setSent(true); };
+  const submit = (e) => { e.preventDefault(); if(form.privacy) (function(){try{window.capdepasTrack && window.capdepasTrack("lead", { source:"contact_form" });}catch(e){}})(); setSent(true); };
 
   const inp = {
     width:'100%', background:'#fff', border:'1.5px solid rgba(0,0,0,0.1)',
