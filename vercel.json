@@ -6,7 +6,7 @@
           { "source": "/sitemap.xml", "destination": "/api/sitemap" },
           { "source": "/robots.txt", "destination": "/api/robots" },
           { "source": "/llms.txt", "destination": "/api/llms" },
-          { "source": "/proyecto/(.*)", "destination": "/index" }
+          { "source": "/proyecto/((?!.*\\.).*)", "destination": "/index" }
     ],
     "headers": [
           {
