@@ -56,6 +56,8 @@ const App = () => {
   }, [page]);
 
   // Resolve pendingSlug once PROPERTIES is populated.
+  // If properties have loaded but no match exists, clear pendingSlug so the loader
+  // flips from 'Cargando proyecto…' to 'Proyecto no encontrado'.
   React.useEffect(() => {
     if (!pendingSlug) return;
     const list = (typeof PROPERTIES !== 'undefined' && Array.isArray(PROPERTIES)) ? PROPERTIES : [];
@@ -64,6 +66,9 @@ const App = () => {
     if (match) {
       setSelectedProperty(match);
       setPage('project');
+      setPendingSlug(null);
+    } else {
+      // Properties loaded, no match — surface the not-found state.
       setPendingSlug(null);
     }
   }, [pendingSlug, typeof PROPERTIES !== 'undefined' ? PROPERTIES : null]);
