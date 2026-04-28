@@ -172,7 +172,15 @@ const App = () => {
       <Nav currentPage={page} setPage={goTo}/>
       {page==='home' && <HomePage/>}
       {page==='listings'&& <><Listings setPage={goTo} setSelectedProperty={selectProperty}/><Footer setPage={goTo}/></>}
-      {page==='project' && <><ProjectDetail prop={selectedProperty} setPage={goTo}/><Footer setPage={goTo}/></>}
+      {/* Guard: ProjectDetail has hook-ordering issues with prop=null (early return after 4 hooks, then 3 more hooks below). Fix the early return in project-detail.jsx before removing this guard, or you'll get React error #310 on direct hits to /proyecto/:slug while PROPERTIES is still loading. */}
+      {page==='project' && selectedProperty && <><ProjectDetail prop={selectedProperty} setPage={goTo}/><Footer setPage={goTo}/></>}
+      {page==='project' && !selectedProperty && (
+        <div style={{ minHeight:'100vh', background:'#F5F3EE', display:'flex', alignItems:'center', justifyContent:'center', paddingTop:80 }}>
+          <div style={{ fontFamily:'DM Sans', fontSize:14, color:'#9E9890', letterSpacing:2, textTransform:'uppercase' }}>
+            {pendingSlug ? 'Cargando proyecto…' : 'Proyecto no encontrado'}
+          </div>
+        </div>
+      )}
       {page==='blog' && <><div style={{paddingTop:80}}><Blog/></div><Footer setPage={goTo}/></>}
       {page==='map' && <><div style={{paddingTop:80}}><MapSection setPage={goTo} setSelectedProperty={selectProperty}/></div><Footer setPage={goTo}/></>}
       {page==='contact' && <><div style={{paddingTop:80}}><Contact/></div><Footer setPage={goTo}/></>}
