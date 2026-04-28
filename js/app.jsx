@@ -1,5 +1,4 @@
-
-// ── capitaldepas.com · App Router + Tweaks (Light Theme) ────────────────────────────
+// ── capitaldepas.com · App Router + Tweaks (Light Theme) ─────────────────────────────────────────────────────────────────────────
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "heroVariant": "cinematic",
@@ -8,21 +7,90 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "showFeatured": true
 }/*EDITMODE-END*/;
 
+// Map URL pathname -> { page, slug }. Source of truth for which screen renders.
+function readRouteFromLocation() {
+  try {
+    const path = (window.location.pathname || '/').replace(/\/+$/,'') || '/';
+    if (path === '/' || path === '') return { page: 'home', slug: null };
+    if (path === '/proyectos') return { page: 'listings', slug: null };
+    if (path === '/blog') return { page: 'blog', slug: null };
+    if (path === '/contacto') return { page: 'contact', slug: null };
+    if (path === '/mapa') return { page: 'map', slug: null };
+    const m = path.match(/^\/proyecto\/([^\/]+)$/);
+    if (m) return { page: 'project', slug: decodeURIComponent(m[1]) };
+    return { page: 'home', slug: null };
+  } catch (e) {
+    return { page: 'home', slug: null };
+  }
+}
+
+// Map page -> URL pathname for non-project pages.
+function pageToPath(p) {
+  switch (p) {
+    case 'home': return '/';
+    case 'listings': return '/proyectos';
+    case 'blog': return '/blog';
+    case 'contact': return '/contacto';
+    case 'map': return '/mapa';
+    default: return null;
+  }
+}
+
 const App = () => {
-  const [page, setPage] = React.useState(()=>localStorage.getItem('capitaldepas_page')||'home');
+  const initialRoute = readRouteFromLocation();
+  const [page, setPage] = React.useState(initialRoute.page);
   const [selectedProperty, setSelectedProperty] = React.useState(null);
+  // If we land on /proyecto/:slug but PROPERTIES isn't loaded yet, remember the slug
+  // and resolve it once the data arrives.
+  const [pendingSlug, setPendingSlug] = React.useState(initialRoute.slug);
   const [tweaks, setTweaks] = React.useState(TWEAK_DEFAULTS);
   const [tweaksOpen, setTweaksOpen] = React.useState(false);
 
   // Re-renderizar cuando los datos de Google Sheets se hayan cargado
   useDataVersion();
+
   // SEO/ads tracking on logical page change
   React.useEffect(() => {
     if (page !== 'project' && window.resetSeo) window.resetSeo();
     try { window.capdepasTrack && window.capdepasTrack('page_view', { page: page }); } catch(e){}
   }, [page]);
 
-  React.useEffect(()=>{ localStorage.setItem('capitaldepas_page',page); },[page]);
+  // Resolve pendingSlug once PROPERTIES is populated.
+  React.useEffect(() => {
+    if (!pendingSlug) return;
+    const list = (typeof PROPERTIES !== 'undefined' && Array.isArray(PROPERTIES)) ? PROPERTIES : [];
+    if (!list.length) return;
+    const match = list.find(p => p && (p.slug === pendingSlug || String(p.id) === pendingSlug));
+    if (match) {
+      setSelectedProperty(match);
+      setPage('project');
+      setPendingSlug(null);
+    }
+  }, [pendingSlug, typeof PROPERTIES !== 'undefined' ? PROPERTIES : null]);
+
+  // Browser back/forward — re-derive state from URL.
+  React.useEffect(() => {
+    const onPop = () => {
+      const r = readRouteFromLocation();
+      if (r.page === 'project' && r.slug) {
+        const list = (typeof PROPERTIES !== 'undefined' && Array.isArray(PROPERTIES)) ? PROPERTIES : [];
+        const match = list.find(p => p && (p.slug === r.slug || String(p.id) === r.slug));
+        if (match) {
+          setSelectedProperty(match);
+          setPage('project');
+          setPendingSlug(null);
+        } else {
+          setPendingSlug(r.slug);
+          setPage('project');
+        }
+      } else {
+        setPendingSlug(null);
+        setPage(r.page);
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
   React.useEffect(()=>{
     const handler = (e) => {
@@ -40,7 +108,29 @@ const App = () => {
     window.parent.postMessage({type:'__edit_mode_set_keys',edits:{[key]:val}},'*');
   };
 
-  const goTo = (p) => { setPage(p); window.scrollTo({top:0,behavior:'smooth'}); };
+  // Navigate to a non-project page and push the corresponding URL.
+  const goTo = (p) => {
+    setPage(p);
+    const target = pageToPath(p);
+    if (target && window.location.pathname !== target) {
+      try { window.history.pushState({}, '', target); } catch(e) {}
+    }
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  // Navigate to a specific project. Pushes /proyecto/:slug and sets state.
+  const selectProperty = (prop) => {
+    if (!prop) return;
+    setSelectedProperty(prop);
+    setPage('project');
+    setPendingSlug(null);
+    const slug = prop.slug || String(prop.id || '');
+    const target = '/proyecto/' + encodeURIComponent(slug);
+    if (slug && window.location.pathname !== target) {
+      try { window.history.pushState({}, '', target); } catch(e) {}
+    }
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
 
   const FeaturedSection = () => (
     <section style={{ background:'#F5F3EE', padding:'100px 60px' }}>
@@ -51,14 +141,11 @@ const App = () => {
             Proyectos <span style={{ color:'#1550E8' }}>destacados</span>
           </h2>
         </div>
-        <button onClick={()=>goTo('listings')} style={{ background:'none', border:'1.5px solid rgba(21,80,232,0.2)', borderRadius:100, padding:'10px 24px', fontFamily:'DM Sans', fontSize:13, fontWeight:600, color:'#1550E8', cursor:'pointer', transition:'all 0.2s' }}
-          onMouseEnter={e=>{e.target.style.background='rgba(21,80,232,0.06)';}}
-          onMouseLeave={e=>{e.target.style.background='transparent';}}
-          data-cursor="pointer">Ver todos →</button>
+        <button onClick={()=>goTo('listings')} style={{ background:'none', border:'1.5px solid rgba(21,80,232,0.2)', borderRadius:100, padding:'10px 24px', fontFamily:'DM Sans', fontSize:13, fontWeight:600, color:'#1550E8', cursor:'pointer', transition:'all 0.2s' }} onMouseEnter={e=>{e.target.style.background='rgba(21,80,232,0.06)';}} onMouseLeave={e=>{e.target.style.background='transparent';}} data-cursor="pointer">Ver todos →</button>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:24 }}>
         {PROPERTIES.slice(0,3).map(p=>(
-          <PropertyCard key={p.id} prop={p} setPage={goTo} setSelectedProperty={setSelectedProperty}/>
+          <PropertyCard key={p.id} prop={p} setPage={goTo} setSelectedProperty={selectProperty}/>
         ))}
       </div>
     </section>
@@ -70,7 +157,7 @@ const App = () => {
       <FeaturesBanner setPage={goTo}/>
       {tweaks.showFeatured && <FeaturedSection/>}
       <HowItWorks/>
-      <MapSection setPage={goTo} setSelectedProperty={setSelectedProperty}/>
+      <MapSection setPage={goTo} setSelectedProperty={selectProperty}/>
       <Calculator/>
       <Testimonials/>
       <Blog/>
@@ -83,14 +170,12 @@ const App = () => {
     <div style={{ background:'#F5F3EE', minHeight:'100vh', cursor:'none' }}>
       <Cursor/>
       <Nav currentPage={page} setPage={goTo}/>
-
-      {page==='home'    && <HomePage/>}
-      {page==='listings'&& <><Listings setPage={goTo} setSelectedProperty={setSelectedProperty}/><Footer setPage={goTo}/></>}
+      {page==='home' && <HomePage/>}
+      {page==='listings'&& <><Listings setPage={goTo} setSelectedProperty={selectProperty}/><Footer setPage={goTo}/></>}
       {page==='project' && <><ProjectDetail prop={selectedProperty} setPage={goTo}/><Footer setPage={goTo}/></>}
-      {page==='blog'    && <><div style={{paddingTop:80}}><Blog/></div><Footer setPage={goTo}/></>}
-      {page==='map'     && <><div style={{paddingTop:80}}><MapSection setPage={goTo} setSelectedProperty={setSelectedProperty}/></div><Footer setPage={goTo}/></>}
+      {page==='blog' && <><div style={{paddingTop:80}}><Blog/></div><Footer setPage={goTo}/></>}
+      {page==='map' && <><div style={{paddingTop:80}}><MapSection setPage={goTo} setSelectedProperty={selectProperty}/></div><Footer setPage={goTo}/></>}
       {page==='contact' && <><div style={{paddingTop:80}}><Contact/></div><Footer setPage={goTo}/></>}
-
       {tweaks.showWhatsApp && <WhatsAppFloat/>}
 
       {/* Tweaks Panel */}
