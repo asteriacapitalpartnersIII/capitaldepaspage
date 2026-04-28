@@ -71,7 +71,7 @@ const App = () => {
       // Properties loaded, no match — surface the not-found state.
       setPendingSlug(null);
     }
-  }, [pendingSlug, typeof PROPERTIES !== 'undefined' ? PROPERTIES : null]);
+  }, [pendingSlug, typeof PROPERTIES !== 'undefined' && Array.isArray(PROPERTIES) ? PROPERTIES.length : 0]);
 
   // Browser back/forward — re-derive state from URL.
   React.useEffect(() => {
