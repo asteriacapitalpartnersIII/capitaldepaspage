@@ -231,8 +231,23 @@ function PropertyPlaceholder({ hue, height, label }) {
         );
 }
 
+// ── WhatsApp display number (from /api/config) ──
+// Returns null until the config fetch resolves, then the raw digits string
+// (e.g. "14155238886") or null/empty if env var unset. Components should
+// gate on this and skip rendering WhatsApp UI when null/empty.
+const useWhatsAppNumber = () => {
+    const [num, setNum] = React.useState(window.WHATSAPP_DISPLAY_NUMBER || null);
+    React.useEffect(() => {
+          if (num) return;
+          if (window.WHATSAPP_READY && typeof window.WHATSAPP_READY.then === 'function') {
+                  window.WHATSAPP_READY.then(v => setNum(v || null));
+          }
+    }, []);
+    return num;
+};
+
 Object.assign(window, {
     PROPERTIES, BLOG_POSTS, TESTIMONIALS, FAQS,
-    useScrollReveal, useMagnetic, useParallax, useCounter, useDataVersion,
+    useScrollReveal, useMagnetic, useParallax, useCounter, useDataVersion, useWhatsAppNumber,
     PropertyPlaceholder
 });
