@@ -5,7 +5,7 @@ const ProjectDetail = ({ prop, setPage }) => {
   const [activeTab, setActiveTab] = React.useState('overview');
   const [activeImg, setActiveImg] = React.useState(0);
   const magBtn = useMagnetic(0.3);
-  const [ref, vis] = useScrollReveal(0.05);
+  const [ref, vis] = useScrollReveal(0.05); const waNumber = useWhatsAppNumber();
 
   if (!prop) return null;
   if (window.useProjectSeo) window.useProjectSeo(prop);
@@ -132,7 +132,7 @@ const ProjectDetail = ({ prop, setPage }) => {
                 onMouseLeave={e=>{e.target.style.background='#1550E8';e.target.style.transform='scale(1)';}}
                 data-cursor="pointer">Solicitar información</button>
 
-              <a href={"https://wa.me/525512345678?text="+encodeURIComponent("Hola, me interesa el proyecto "+prop.name)} target="_blank" rel="noreferrer" onClick={()=>{try{window.capdepasTrack && window.capdepasTrack("contact", { method:"whatsapp", content_name: prop.name, content_ids:[prop.slug||prop.id] });}catch(e){}}}
+              {waNumber && <a href={"https://wa.me/"+waNumber+"?text="+encodeURIComponent("Hola, me interesa el proyecto "+prop.name)} target="_blank" rel="noreferrer" onClick={()=>{try{window.capdepasTrack && window.capdepasTrack("contact", { method:"whatsapp", content_name: prop.name, content_ids:[prop.slug||prop.id] });}catch(e){}}}
                 style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:10, background:'rgba(37,211,102,0.1)', border:'1.5px solid rgba(37,211,102,0.25)', borderRadius:12, padding:'12px', fontFamily:'DM Sans', fontSize:14, fontWeight:700, color:'#16a34a', cursor:'pointer', textDecoration:'none', transition:'all 0.2s' }}
                 onMouseEnter={e=>e.currentTarget.style.background='rgba(37,211,102,0.18)'}
                 onMouseLeave={e=>e.currentTarget.style.background='rgba(37,211,102,0.1)'}
@@ -141,7 +141,7 @@ const ProjectDetail = ({ prop, setPage }) => {
                 Chatear por WhatsApp
               </a>
 
-              <div style={{ marginTop:18, display:'flex', alignItems:'center', gap:8 }}>
+              }<div style={{ marginTop:18, display:'flex', alignItems:'center', gap:8 }}>
                 <div style={{ width:8, height:8, borderRadius:'50%', background:'#4ade80', flexShrink:0 }} />
                 <span style={{ fontFamily:'DM Sans', fontSize:12, color:'#9E9890' }}>Asesor disponible ahora</span>
               </div>
