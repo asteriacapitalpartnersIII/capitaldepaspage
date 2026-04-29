@@ -6,7 +6,7 @@ const Contact = () => {
   const [sent, setSent] = React.useState(false);
   const [openFaq, setOpenFaq] = React.useState(null);
   const [showPrivacy, setShowPrivacy] = React.useState(false);
-  const [ref, vis] = useScrollReveal(0.05);
+  const [ref, vis] = useScrollReveal(0.05); const waNumber = useWhatsAppNumber();
 
   const update = (k,v) => setForm(f=>({...f,[k]:v}));
   const submit = (e) => { e.preventDefault(); if(form.privacy) (function(){try{window.capdepasTrack && window.capdepasTrack("lead", { source:"contact_form" });}catch(e){}})(); setSent(true); };
@@ -92,7 +92,7 @@ const Contact = () => {
 
           {/* Info panel */}
           <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            {/* WhatsApp */}
+            {/* WhatsApp (gated by useWhatsAppNumber) */}{waNumber && (
             <div style={{ background:'#fff', border:'1.5px solid rgba(37,211,102,0.25)', borderRadius:20, padding:'24px', boxShadow:'0 4px 20px rgba(37,211,102,0.07)' }}>
               <div style={{ display:'flex', alignItems:'center', gap:14, marginBottom:16 }}>
                 <div style={{ width:44, height:44, borderRadius:12, background:'rgba(37,211,102,0.12)', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -103,14 +103,14 @@ const Contact = () => {
                   <div style={{ fontFamily:'DM Sans', fontSize:12, color:'#9E9890', marginTop:2 }}>Respuesta en minutos</div>
                 </div>
               </div>
-              <a href="https://wa.me/525512345678?text=Hola, quiero información sobre capitaldepas.com" target="_blank" rel="noreferrer"
+              <a href={"https://wa.me/"+waNumber+"?text=Hola, quiero información sobre capitaldepas.com"} target="_blank" rel="noreferrer"
                 style={{ display:'block', textAlign:'center', background:'rgba(37,211,102,0.1)', border:'1px solid rgba(37,211,102,0.25)', borderRadius:10, padding:'12px', fontFamily:'DM Sans', fontSize:14, fontWeight:700, color:'#16a34a', textDecoration:'none', transition:'all 0.2s' }}
                 onMouseEnter={e=>e.currentTarget.style.background='rgba(37,211,102,0.18)'}
                 onMouseLeave={e=>e.currentTarget.style.background='rgba(37,211,102,0.1)'}
-                data-cursor="pointer">+52 55 1234 5678</a>
+                data-cursor="pointer">+{waNumber}</a>
             </div>
 
-            {/* Social */}
+            )}{/* Social */}
             <div style={{ background:'#fff', borderRadius:18, padding:'20px 22px', border:'1.5px solid rgba(0,0,0,0.06)' }}>
               <div style={{ fontFamily:'DM Sans', fontSize:11, letterSpacing:2, color:'#9E9890', textTransform:'uppercase', marginBottom:14 }}>Síguenos</div>
               <div style={{ display:'flex', gap:10 }}>
