@@ -135,18 +135,19 @@
   <!-- Carga de config (token Mapbox + IDs de pixels) y bootstrap de tracking -->
   <script>
     (function() {
-      window.MAPBOX_TOKEN_READY = new Promise(function(resolve) {
+      window.WHATSAPP_READY = new Promise(function(resolveWA){ window.__resolveWhatsApp = resolveWA; });
+            window.MAPBOX_TOKEN_READY = new Promise(function(resolve) {
         fetch('/api/config').then(function(r){ return r.ok ? r.json() : {}; }).then(function(cfg){
           cfg = cfg || {};
           if (cfg.mapboxToken) {
             window.MAPBOX_TOKEN = cfg.mapboxToken;
             if (typeof mapboxgl !== 'undefined') mapboxgl.accessToken = cfg.mapboxToken;
           }
-          window.__PIXELS = cfg.pixels || {};
+          window.__PIXELS = cfg.pixels || {}; window.WHATSAPP_DISPLAY_NUMBER = cfg.whatsappDisplayNumber || ''; window.__resolveWhatsApp(window.WHATSAPP_DISPLAY_NUMBER);
           // Carga de pixels de ads (solo si hay ID configurado)
           try { window.__bootPixels && window.__bootPixels(window.__PIXELS); } catch (e) {}
           resolve(window.MAPBOX_TOKEN || null);
-        }).catch(function(){ resolve(null); });
+        }).catch(function(){ resolve(null); window.__resolveWhatsApp && window.__resolveWhatsApp(''); });
       });
 
       // dataLayer para Google Tag Manager / GA4
