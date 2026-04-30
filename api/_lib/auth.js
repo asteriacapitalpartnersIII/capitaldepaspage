@@ -1,45 +1,82 @@
 // api/_lib/auth.js — HMAC-signed cookie auth middleware
 // Wraps admin API endpoints. Returns 401 on any auth failure,
 // deliberately avoiding specifics (no 'cookie missing' vs 'expired').
-
+//
+// Session epoch: stored in KV as session_epoch (integer).
+// Each cookie HMAC covers both exp and epoch. Bumping the epoch in KV
+// (via /api/admin/logout-all) invalidates ALL existing cookies instantly.
 const { createHmac, timingSafeEqual } = require('crypto');
 
-function signToken(exp) {
-  const secret = process.env.ADMIN_SESSION_SECRET || '';
-  return createHmac('sha256', secret).update(String(exp)).digest('hex');
+let _kv = null;
+function getKv() {
+    if (!_kv) _kv = require('@vercel/kv').kv;
+    return _kv;
 }
 
-function verifyToken(token) {
-  if (!token || typeof token !== 'string') return false;
-  const dot = token.indexOf('.');
-  if (dot < 0) return false;
-  const exp = token.slice(0, dot);
-  const hmac = token.slice(dot + 1);
-  const expected = signToken(exp);
+function signToken(exp, epoch) {
+    const secret = process.env.ADMIN_SESSION_SECRET || '';
+    const payload = String(exp) + ':' + String(epoch || 0);
+    return createHmac('sha256', secret).update(payload).digest('hex');
+}
+
+async function verifyToken(token) {
+    if (!token || typeof token !== 'string') return false;
+    const dot = token.indexOf('.');
+    if (dot < 0) return false;
+    const exp = token.slice(0, dot);
+    const rest = token.slice(dot + 1);
+
+  // Format: {exp}.{epoch}.{hmac}  (new)  OR  {exp}.{hmac}  (legacy pre-epoch)
+  const dot2 = rest.indexOf('.');
+    let epoch, hmac;
+    if (dot2 >= 0) {
+          epoch = rest.slice(0, dot2);
+          hmac = rest.slice(dot2 + 1);
+    } else {
+          // Legacy token (no epoch embedded) — treat as epoch 0
+      epoch = '0';
+          hmac = rest;
+    }
+
+  const expected = signToken(exp, epoch);
+    try {
+          if (!timingSafeEqual(Buffer.from(hmac), Buffer.from(expected))) return false;
+    } catch {
+          return false;
+    }
+
+  if (parseInt(exp, 10) <= Date.now()) return false;
+
+  // Check session_epoch in KV
   try {
-    if (!timingSafeEqual(Buffer.from(hmac), Buffer.from(expected))) return false;
-  } catch { return false; }
-  return parseInt(exp, 10) > Date.now();
+        const kv = getKv();
+        const currentEpoch = (await kv.get('session_epoch')) || 0;
+        if (Number(epoch) < Number(currentEpoch)) return false;
+  } catch {
+        // If KV is down, don't block logins — fail open on epoch check only
+  }
+
+  return true;
 }
 
 function parseCookies(req) {
-  const raw = req.headers.cookie || '';
-  return Object.fromEntries(raw.split(';').map(c => {
-    const i = c.indexOf('=');
-    return i < 0 ? [c.trim(), ''] : [c.slice(0, i).trim(), c.slice(i + 1).trim()];
-  }));
+    const raw = req.headers.cookie || '';
+    return Object.fromEntries(raw.split(';').map(c => {
+          const i = c.indexOf('=');
+          return i < 0 ? [c.trim(), ''] : [c.slice(0, i).trim(), c.slice(i + 1).trim()];
+    }));
 }
 
 // Returns the handler wrapped with auth. On success, handler is called.
 // On fail: 401, no body.
 function withAuth(handler) {
-  return async (req, res) => {
-    const cookies = parseCookies(req);
-    if (!verifyToken(cookies.cdp_admin || '')) {
-      return res.status(401).end();
-    }
-    return handler(req, res);
-  };
+    return async (req, res) => {
+          const cookies = parseCookies(req);
+          if (!(await verifyToken(cookies.cdp_admin || ''))) {
+                  return res.status(401).end();
+          }
+          return handler(req, res);
+    };
 }
 
 module.exports = { withAuth, signToken };
