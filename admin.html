@@ -229,11 +229,45 @@ function TranscriptPane({ from, onLogout, onBack }) {
 }
 
 // ── Main Admin App ────────────────────────────────────────────────────────────
+// ── Login Activity Log ──────────────────────────────────────────────────────
+function LogActivity({ onClose }) {
+  const [logs, setLogs] = React.useState(null);
+  React.useEffect(() => {
+    api('GET','loginlog').then(r => {
+      if (!r.__401) setLogs(Array.isArray(r) ? r : []);
+    }).catch(() => setLogs([]));
+  }, []);
+  return (
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={onClose}>
+      <div style={{background:'#fff',borderRadius:16,padding:28,width:520,maxHeight:'70vh',overflowY:'auto',boxShadow:'0 20px 60px rgba(0,0,0,0.2)'}} onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+          <h2 style={{fontSize:18,fontFamily:'Playfair Display',fontWeight:700}}>Actividad reciente</h2>
+          <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',fontSize:20,color:'#9E9890'}}>×</button>
+        </div>
+        {logs === null && <p style={{color:'#9E9890',fontSize:13}}>Cargando…</p>}
+        {logs && logs.length === 0 && <p style={{color:'#9E9890',fontSize:13}}>Sin actividad registrada.</p>}
+        {logs && logs.map((l, i) => (
+          <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid rgba(0,0,0,0.06)'}}>
+            <div>
+              <span style={{fontSize:12,fontWeight:700,color:l.success?'#10b981':'#ef4444'}}>{l.success?'OK':'FALLO'}</span>
+              <span style={{fontSize:11,color:'#9E9890',marginLeft:8}}>IP hash: {l.ipHash}</span>
+            </div>
+            <span style={{fontSize:11,color:'#9E9890'}}>{l.at ? new Date(l.at).toLocaleString('es-MX') : ''}</span>
+          </div>
+        ))}
+        <p style={{fontSize:11,color:'#9E9890',marginTop:12}}>Últimos 100 intentos. Se eliminan automáticamente después de 30 días.</p>
+      </div>
+    </div>
+  );
+}
+
+
 function AdminApp() {
   const [authed, setAuthed] = useState(false);
   const [chats, setChats] = useState([]);
   const [selected, setSelected] = useState(null);
   const [mobileView, setMobileView] = useState('list'); // 'list' | 'chat'
+  const [showLog, setShowLog] = useState(false);
   const pollRef = useRef(null);
 
   // Deep link: /admin?chat=whatsapp%3A%2B1...
@@ -261,6 +295,20 @@ function AdminApp() {
     setAuthed(false); setChats([]); setSelected(null);
   }
 
+  async function onLogoutAll() {
+    if (!confirm('Esto cerrara tu sesion y la de tu mama. Tendran que volver a entrar. Continuar?')) return;
+    const r = await api('POST','logout-all').catch(()=>({__401:false,error:'red'}));
+    if (r.ok) {
+      alert('Todas las sesiones cerradas. Inicia sesion nuevamente.');
+      clearInterval(pollRef.current);
+      setAuthed(false);
+      setChats([]);
+      setSelected(null);
+    } else {
+      alert('Error al cerrar sesiones. Intenta de nuevo.');
+    }
+  }
+
   useEffect(() => () => clearInterval(pollRef.current), []);
 
   function selectChat(from) {
@@ -278,7 +326,9 @@ function AdminApp() {
       <div style={{height:52,background:'#fff',borderBottom:'1px solid rgba(0,0,0,0.07)',display:'flex',alignItems:'center',padding:'0 20px',gap:16,flexShrink:0}}>
         <span style={{fontFamily:'Playfair Display',fontSize:18,fontWeight:700,color:'#0E0E0C'}}>capitaldepas <span style={{color:BLUE,fontSize:13,fontWeight:500,fontFamily:'DM Sans'}}>admin</span></span>
         <div style={{flex:1}}/>
-        <button onClick={onLogout} style={{background:'none',border:'1.5px solid rgba(0,0,0,0.12)',borderRadius:8,padding:'5px 14px',fontFamily:'DM Sans',fontSize:12,cursor:'pointer',color:'#6B6560'}}>Salir</button>
+        <button onClick={()=>setShowLog(!showLog)} style={{background:'none',border:'1.5px solid rgba(0,0,0,0.12)',borderRadius:8,padding:'5px 14px',fontFamily:'DM Sans',fontSize:11,cursor:'pointer',color:'#9E9890'}}>Actividad</button>
+            <button onClick={onLogoutAll} style={{background:'none',border:'1.5px solid rgba(239,68,68,0.3)',borderRadius:8,padding:'5px 14px',fontFamily:'DM Sans',fontSize:11,cursor:'pointer',color:'#ef4444'}} title="Cierra la sesión de todos los dispositivos">Cerrar sesiones</button>
+            <button onClick={onLogout} style={{background:'none',border:'1.5px solid rgba(0,0,0,0.12)',borderRadius:8,padding:'5px 14px',fontFamily:'DM Sans',fontSize:12,cursor:'pointer',color:'#6B6560'}}>Salir</button>
       </div>
       {/* Body */}
       <div style={{flex:1,display:'flex',overflow:'hidden'}}>
@@ -300,6 +350,10 @@ function AdminApp() {
             ? <TranscriptPane from={selected} onLogout={onLogout} onBack={isMobile?()=>setMobileView('list'):null}/>
             : <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:'#9E9890',fontSize:14}}>Selecciona una conversación</div>
         )}
+      {/* Login Activity Log Panel */}
+      {showLog && (
+        <LogActivity onClose={() => setShowLog(false)} />
+      )}
       </div>
     </div>
   );
