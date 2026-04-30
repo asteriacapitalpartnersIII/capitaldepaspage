@@ -68,10 +68,12 @@ module.exports = withAuth(async function handler(req, res) {
   const chats = await Promise.all(keys.map(k => kvGet(k)));
   const summaries = chats
     .filter(Boolean)
-    .map(raw => {
+    .map((raw, i) => {
       const chat = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      // Derive "from" from the KV key (key = "chat:whatsapp:+52155...") if not stored in object
+      const fromDerived = chat.from || keys[i].replace(/^chat:/, '');
       return {
-        from: chat.from,
+        from: fromDerived,
         lastMessageAt: chat.lastMessageAt || 0,
         lastMessagePreview: (chat.history || []).slice(-1)[0]?.content?.slice(0, 80) || '',
         score: chat.score || 0,
