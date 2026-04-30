@@ -78,6 +78,7 @@ function rowToProject(headers, row) {
     amenities: toList(get('amenidades')),
     desc: get('descripcion'),
     photos: toList(get('fotos')).map(resolvePhoto).filter(Boolean),
+  brochure: get('brochure') || null,
     accentHue: toNumber(get('hue')) || 220,
     featured: yesish(get('destacado')),
     lat, lng, hasCoords: lat !== null && lng !== null,
