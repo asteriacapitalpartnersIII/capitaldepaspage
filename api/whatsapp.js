@@ -132,6 +132,7 @@ function buildSystemPrompt(properties) {
         estado: p.type,
         desarrollador: p.developer,
         amenidades: p.amenities,
+    brochure: p.brochure || null,
   }));
     return [
           'Eres asistente de Capital Depas, una desarrolladora inmobiliaria mexicana',
@@ -146,14 +147,18 @@ function buildSystemPrompt(properties) {
           'CATÁLOGO ACTUAL (única fuente de verdad sobre proyectos, ubicaciones y precios):',
           JSON.stringify(catalog, null, 2),
           '',
-          'INFORMACIÓN A RECABAR (una pregunta a la vez, en orden flexible):',
+          'BROCHURE: Si el catálogo incluye un campo "brochure" no vacío para el proyecto de interés,',
+'compártelo de forma natural cuando el cliente haya dado su nombre y el proyecto de interés.',
+'Ejemplo: "Aquí te comparto el brochure de [Proyecto]: [URL]".',
+'Comparte el brochure solo UNA vez por conversación. Si no hay brochure, no lo menciones.',
+'',
+'INFORMACIÓN A RECABAR (una pregunta a la vez, en orden flexible):',
           '1. Nombre',
           '2. Proyecto o zona de interés (referencia el catálogo)',
           '3. Presupuesto aproximado',
           '4. ¿Compra o renta?',
           '5. Si compra: ¿contado, crédito hipotecario, INFONAVIT/FOVISSSTE?',
           '6. Tiempo estimado para decidir',
-          '7. Correo electrónico',
           '',
           'TONO:',
           '- Mexicano, cálido, profesional. Default tutea ("tú"). Si el cliente usa',
@@ -183,13 +188,14 @@ function buildSystemPrompt(properties) {
           '- El cliente menciona una desarrolladora o proyecto competidor por nombre.',
           '- El cliente expresa decisión de compra: "lo quiero", "me decido", "cuándo',
           '  firmamos", "dónde firmo", "lo aparto".',
+          '- El cliente solicita agendar una visita o una cita.',
           '- El cliente insulta, amenaza o envía spam tras un primer intento cortés de',
           '  reconducir la conversación.',
           'El sistema reemplazará tu mensaje con el handoff estándar y notificará al asesor.',
           '',
           'OUTPUT OBLIGATORIO — al final de CADA respuesta, en una nueva línea, agrega:',
           '',
-          '[STATE]{"score": 0-100, "leadData": {"name":"","project":"","budget":"","intent":"buy|rent|unknown","financing":"","timeline":"","email":""}, "nextStep": "qualifying|ready|escalate"}[/STATE]',
+          '[STATE]{"score": 0-100, "leadData": {"name":"","project":"","budget":"","intent":"buy|rent|unknown","financing":"","timeline":""}, "nextStep": "qualifying|ready|escalate"}[/STATE]',
           '',
           'CRITERIOS DE SCORE:',
           '- 0-30: saludo o pregunta inicial sin información personal',
@@ -331,7 +337,7 @@ async function processMessage(from, text, sid) {
   // ESCALAR detection — loose match anywhere in raw reply
   const escalated = /\[ESCALAR\]/i.test(rawReply) || (state && state.nextStep === 'escalate');
     if (escalated) {
-          visible = 'Te conecto con un asesor humano, te responderá en breve.';
+          visible = 'Te transfiero con un asesor senior, te contactará en breve.';
     } else {
           // Strip any stray [ESCALAR] tokens just in case
       visible = visible.replace(/\[ESCALAR\]/gi, '').trim();
