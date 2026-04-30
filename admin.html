@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Admin — capitaldepas.com</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#F5F3EE;color:#0E0E0C;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Playfair Display',serif}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(21,80,232,.25);border-radius:100px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+const BLUE = '#1550E8';
+const BG = '#F5F3EE';
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function relTime(ts) {
+  if (!ts) return '';
+  const s = Math.floor((Date.now() - ts) / 1000);
+  if (s < 60) return 'ahora';
+  if (s < 3600) return Math.floor(s/60) + ' min';
+  if (s < 86400) return Math.floor(s/3600) + ' h';
+  return Math.floor(s/86400) + ' d';
+}
+function shortPhone(from) {
+  const m = from.replace('whatsapp:+','').replace(/D/g,'');
+  return '···' + m.slice(-4);
+}
+function displayName(chat) {
+  return chat.leadDataSummary?.name || chat.leadData?.name || shortPhone(chat.from || '');
+}
+function scoreColor(s) {
+  if (s >= 85) return '#ef4444';
+  if (s >= 70) return '#f97316';
+  return '#9E9890';
+}
+
+// ── API ──────────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = { method, credentials: 'include', headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch('/api/admin/' + path, opts);
+  if (r.status === 401) return { __401: true };
+  if (!r.ok) throw new Error(r.status);
+  const ct = r.headers.get('content-type') || '';
+  return ct.includes('json') ? r.json() : {};
+}
+
+// ── Login ────────────────────────────────────────────────────────────────────
+function LoginView({ onLogin }) {
+  const [pw, setPw] = useState('');
+  const [err, setErr] = useState(false);
+  const [loading, setLoading] = useState(false);
+  async function submit(e) {
+    e.preventDefault();
+    setLoading(true); setErr(false);
+    const r = await api('POST','login',{password:pw}).catch(()=>({__401:true}));
+    setLoading(false);
+    if (r.__401) { setErr(true); return; }
+    onLogin();
+  }
+  return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:BG}}>
+      <div style={{background:'#fff',borderRadius:24,padding:40,width:340,boxShadow:'0 8px 40px rgba(0,0,0,0.08)',border:'1.5px solid rgba(0,0,0,0.06)'}}>
+        <h1 style={{fontSize:28,marginBottom:8,color:'#0E0E0C'}}>capitaldepas</h1>
+        <p style={{fontSize:13,color:'#9E9890',marginBottom:28}}>Panel de administración</p>
+        <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:14}}>
+          <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="Contraseña" autoFocus
+            style={{width:'100%',background:err?'rgba(239,68,68,0.05)':'#F5F3EE',border:`1.5px solid ${err?'#ef4444':'rgba(0,0,0,0.08)'}`,borderRadius:10,padding:'12px 14px',fontFamily:'DM Sans',fontSize:14,outline:'none'}}/>
+          {err && <p style={{fontSize:12,color:'#ef4444',marginTop:-8}}>Contraseña incorrecta</p>}
+          <button type="submit" disabled={loading} style={{background:BLUE,border:'none',borderRadius:10,padding:'13px',fontFamily:'DM Sans',fontSize:15,fontWeight:700,color:'#fff',cursor:'pointer'}}>
+            {loading ? 'Entrando…' : 'Entrar'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Chat List Row ─────────────────────────────────────────────────────────────
+function ChatRow({ chat, active, onClick }) {
+  const s = chat.score || 0;
+  return (
+    <div onClick={onClick} style={{padding:'14px 18px',borderBottom:'1px solid rgba(0,0,0,0.05)',cursor:'pointer',background:active?'rgba(21,80,232,0.06)':'transparent',transition:'background 0.15s'}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+        <span style={{fontWeight:700,fontSize:14,color:'#0E0E0C'}}>{displayName(chat)}</span>
+        <span style={{fontSize:11,color:'#9E9890'}}>{relTime(chat.lastMessageAt)}</span>
+      </div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8}}>
+        <span style={{fontSize:12,color:'#9E9890',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{chat.lastMessagePreview}</span>
+        <div style={{display:'flex',gap:6,flexShrink:0}}>
+          {s > 0 && <span style={{fontSize:11,fontWeight:700,color:scoreColor(s),background:scoreColor(s)+'18',borderRadius:100,padding:'2px 8px'}}>{s}</span>}
+          {!chat.aiActive && <span style={{fontSize:10,fontWeight:700,color:'#f97316',background:'#f9731618',borderRadius:100,padding:'2px 8px'}}>TOMADO</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Message Bubble ────────────────────────────────────────────────────────────
+function Bubble({ msg }) {
+  const isCustomer = msg.role === 'user';
+  const isHuman = msg.role === 'human';
+  const isAi = msg.role === 'assistant';
+  const align = isCustomer ? 'flex-start' : isHuman ? 'flex-end' : 'center';
+  const bg = isCustomer ? '#fff' : isHuman ? BLUE : '#E8E6E1';
+  const color = isHuman ? '#fff' : '#0E0E0C';
+  const ts = msg.ts ? new Date(msg.ts).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}) : '';
+  return (
+    <div style={{display:'flex',justifyContent:align,marginBottom:8}}>
+      <div style={{maxWidth:'70%',background:bg,borderRadius:14,padding:'10px 14px',boxShadow:'0 1px 4px rgba(0,0,0,0.06)'}}>
+        {isAi && <div style={{fontSize:10,color:'#9E9890',marginBottom:3,fontWeight:700}}>AI</div>}
+        <div style={{fontSize:14,color,lineHeight:1.6,whiteSpace:'pre-wrap'}}>{msg.content}</div>
+        {ts && <div style={{fontSize:10,color:isHuman?'rgba(255,255,255,0.7)':'#9E9890',marginTop:4,textAlign:'right'}}>{ts}</div>}
+      </div>
+    </div>
+  );
+}
+
+// ── Transcript Pane ───────────────────────────────────────────────────────────
+function TranscriptPane({ from, onLogout, onBack }) {
+  const [chat, setChat] = useState(null);
+  const [msg, setMsg] = useState('');
+  const [sending, setSending] = useState(false);
+  const bottomRef = useRef(null);
+  const pollRef = useRef(null);
+
+  const load = useCallback(async () => {
+    const r = await api('GET', 'chats/' + encodeURIComponent(from));
+    if (r.__401) { onLogout(); return; }
+    setChat(r);
+  }, [from]);
+
+  useEffect(() => {
+    load();
+    pollRef.current = setInterval(load, 10000);
+    return () => clearInterval(pollRef.current);
+  }, [load]);
+
+  useEffect(() => {
+    if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [chat?.history?.length]);
+
+  async function takeover() {
+    const r = await api('POST', `chats/${encodeURIComponent(from)}/takeover`);
+    if (!r.__401) setChat(r);
+  }
+  async function release() {
+    const r = await api('POST', `chats/${encodeURIComponent(from)}/release`);
+    if (!r.__401) setChat(r);
+  }
+  async function send() {
+    if (!msg.trim() || sending) return;
+    setSending(true);
+    const r = await api('POST', `chats/${encodeURIComponent(from)}/send`, { body: msg });
+    setSending(false);
+    if (!r.__401) { setChat(r); setMsg(''); }
+  }
+
+  if (!chat) return <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:'#9E9890'}}>Cargando…</div>;
+
+  const ld = chat.leadData || {};
+  const chips = [
+    ld.name && { label:'Nombre', val: ld.name },
+    ld.budget && { label:'Presupuesto', val: ld.budget },
+    ld.zone && { label:'Zona', val: ld.zone },
+    ld.timeline && { label:'Plazo', val: ld.timeline },
+    ld.email && { label:'Email', val: ld.email },
+  ].filter(Boolean);
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100%',flex:1,minWidth:0}}>
+      {/* Header */}
+      <div style={{padding:'14px 20px',borderBottom:'1px solid rgba(0,0,0,0.07)',background:'#fff',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+          {onBack && <button onClick={onBack} style={{background:'none',border:'none',cursor:'pointer',fontSize:20,color:'#6B6560',padding:0}}>←</button>}
+          <div style={{flex:1}}>
+            <div style={{fontWeight:700,fontSize:16}}>{displayName(chat)}</div>
+            <div style={{fontSize:11,color:'#9E9890'}}>{(chat.from||'').replace('whatsapp:','')}</div>
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            <span style={{fontSize:13,fontWeight:700,color:scoreColor(chat.score||0)}}>Score: {chat.score||0}</span>
+            {chat.aiActive === false
+              ? <button onClick={release} style={{background:'#10b98120',color:'#10b981',border:'1px solid #10b98140',borderRadius:8,padding:'6px 14px',fontFamily:'DM Sans',fontSize:12,fontWeight:700,cursor:'pointer'}}>Devolver al AI</button>
+              : <button onClick={takeover} style={{background:'#f9731620',color:'#f97316',border:'1px solid #f9731640',borderRadius:8,padding:'6px 14px',fontFamily:'DM Sans',fontSize:12,fontWeight:700,cursor:'pointer'}}>Tomar control</button>
+            }
+          </div>
+        </div>
+        {chips.length > 0 && (
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+            {chips.map(c => (
+              <span key={c.label} style={{fontSize:11,background:'rgba(21,80,232,0.08)',color:BLUE,borderRadius:100,padding:'2px 10px',fontWeight:600}}>
+                {c.label}: {c.val}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* Messages */}
+      <div style={{flex:1,overflowY:'auto',padding:'16px 20px',background:'#F8F6F2'}}>
+        {(chat.history||[]).map((m,i) => <Bubble key={i} msg={m}/>)}
+        <div ref={bottomRef}/>
+      </div>
+      {/* Input */}
+      <div style={{padding:'12px 16px',borderTop:'1px solid rgba(0,0,0,0.07)',background:'#fff',display:'flex',gap:10,flexShrink:0}}>
+        <textarea value={msg} onChange={e=>setMsg(e.target.value)}
+          onKeyDown={e=>{ if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)) send(); }}
+          placeholder="Escribe un mensaje como asesor… (Cmd+Enter para enviar)"
+          style={{flex:1,border:'1.5px solid rgba(0,0,0,0.1)',borderRadius:10,padding:'10px 12px',fontFamily:'DM Sans',fontSize:13,resize:'none',outline:'none',minHeight:60}}/>
+        <button onClick={send} disabled={sending||!msg.trim()} style={{background:BLUE,border:'none',borderRadius:10,padding:'0 18px',fontFamily:'DM Sans',fontSize:13,fontWeight:700,color:'#fff',cursor:'pointer',alignSelf:'flex-end',height:44,flexShrink:0}}>
+          {sending?'…':'Enviar'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Admin App ────────────────────────────────────────────────────────────
+function AdminApp() {
+  const [authed, setAuthed] = useState(false);
+  const [chats, setChats] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [mobileView, setMobileView] = useState('list'); // 'list' | 'chat'
+  const pollRef = useRef(null);
+
+  // Deep link: /admin?chat=whatsapp%3A%2B1...
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const chatParam = params.get('chat');
+    if (chatParam) setSelected(decodeURIComponent(chatParam));
+  }, []);
+
+  const loadChats = useCallback(async () => {
+    const r = await api('GET','chats');
+    if (r.__401) { setAuthed(false); return; }
+    if (Array.isArray(r)) setChats(r);
+  }, []);
+
+  function onLogin() {
+    setAuthed(true);
+    loadChats();
+    pollRef.current = setInterval(loadChats, 10000);
+  }
+
+  function onLogout() {
+    clearInterval(pollRef.current);
+    api('POST','logout').catch(()=>{});
+    setAuthed(false); setChats([]); setSelected(null);
+  }
+
+  useEffect(() => () => clearInterval(pollRef.current), []);
+
+  function selectChat(from) {
+    setSelected(from);
+    setMobileView('chat');
+  }
+
+  if (!authed) return <LoginView onLogin={onLogin}/>;
+
+  const isMobile = window.innerWidth < 700;
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100vh',overflow:'hidden'}}>
+      {/* Top bar */}
+      <div style={{height:52,background:'#fff',borderBottom:'1px solid rgba(0,0,0,0.07)',display:'flex',alignItems:'center',padding:'0 20px',gap:16,flexShrink:0}}>
+        <span style={{fontFamily:'Playfair Display',fontSize:18,fontWeight:700,color:'#0E0E0C'}}>capitaldepas <span style={{color:BLUE,fontSize:13,fontWeight:500,fontFamily:'DM Sans'}}>admin</span></span>
+        <div style={{flex:1}}/>
+        <button onClick={onLogout} style={{background:'none',border:'1.5px solid rgba(0,0,0,0.12)',borderRadius:8,padding:'5px 14px',fontFamily:'DM Sans',fontSize:12,cursor:'pointer',color:'#6B6560'}}>Salir</button>
+      </div>
+      {/* Body */}
+      <div style={{flex:1,display:'flex',overflow:'hidden'}}>
+        {/* Chat list */}
+        {(!isMobile || mobileView==='list') && (
+          <div style={{width:isMobile?'100%':300,borderRight:'1px solid rgba(0,0,0,0.07)',background:'#fff',overflowY:'auto',flexShrink:0}}>
+            <div style={{padding:'12px 18px 8px',borderBottom:'1px solid rgba(0,0,0,0.05)'}}>
+              <span style={{fontSize:11,letterSpacing:2,color:'#9E9890',textTransform:'uppercase',fontWeight:700}}>Conversaciones ({chats.length})</span>
+            </div>
+            {chats.length === 0 && <div style={{padding:24,fontSize:13,color:'#9E9890',textAlign:'center'}}>Sin conversaciones aún.</div>}
+            {chats.map(c => (
+              <ChatRow key={c.from} chat={c} active={selected===c.from} onClick={()=>selectChat(c.from)}/>
+            ))}
+          </div>
+        )}
+        {/* Transcript */}
+        {(!isMobile || mobileView==='chat') && (
+          selected
+            ? <TranscriptPane from={selected} onLogout={onLogout} onBack={isMobile?()=>setMobileView('list'):null}/>
+            : <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:'#9E9890',fontSize:14}}>Selecciona una conversación</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(AdminApp));
+</script>
+</body>
+</html>
