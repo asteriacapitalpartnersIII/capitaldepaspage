@@ -233,7 +233,7 @@ function TranscriptPane({ from, onLogout, onBack }) {
 function LogActivity({ onClose }) {
   const [logs, setLogs] = React.useState(null);
   React.useEffect(() => {
-    api('GET','loginlog').then(r => {
+    api('GET','chats?log=1').then(r => {
       if (!r.__401) setLogs(Array.isArray(r) ? r : []);
     }).catch(() => setLogs([]));
   }, []);
@@ -297,7 +297,7 @@ function AdminApp() {
 
   async function onLogoutAll() {
     if (!confirm('Esto cerrara tu sesion y la de tu mama. Tendran que volver a entrar. Continuar?')) return;
-    const r = await api('POST','logout-all').catch(()=>({__401:false,error:'red'}));
+    const r = await api('POST','logout?all=1').catch(()=>({__401:false,error:'red'}));
     if (r.ok) {
       alert('Todas las sesiones cerradas. Inicia sesion nuevamente.');
       clearInterval(pollRef.current);
