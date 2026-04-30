@@ -58,7 +58,11 @@ module.exports = withAuth(async function handler(req, res) {
   }
 
   if (action === 'release') {
-    const updated = { ...chat, aiActive: true };
+    // Reset score to 69 so the bot can continue without immediately re-escalating.
+    // (Score ≥ 85 OR nextStep=escalate would trigger [ESCALAR] on the very next message.)
+    // Also clear escalation notification flags so tier-2 alert can fire again if needed.
+    const resetScore = Math.min(chat.score || 0, 69);
+    const updated = { ...chat, aiActive: true, score: resetScore, notifiedMom85At: null };
     await kvSet(key, updated);
     return res.status(200).json(updated);
   }
