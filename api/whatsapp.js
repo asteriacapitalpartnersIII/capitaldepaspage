@@ -304,10 +304,19 @@ async function processMessage(from, text, sid) {
     const properties = (projData && projData.properties) || [];
     const sys = buildSystemPrompt(properties);
 
+  // Inject a note for Grok if the conversation was previously escalated
+  // (last assistant msg contains handoff text). This prevents immediate re-escalation.
+  const histForGrok = chat.history.slice(-20).map(h => ({
+    role: (h.role === 'human') ? 'assistant' : h.role,
+    content: h.content,
+  }));
+  const lastAsst = [...histForGrok].reverse().find(m => m.role === 'assistant');
+  const wasEscalated = lastAsst && /asesor senior|asesor humano|te transfiero/i.test(lastAsst.content);
   const messages = [
     { role: 'system', content: sys },
-        ...chat.history.slice(-20).map(h => ({ role: h.role, content: h.content })),
-      ];
+    ...histForGrok,
+    ...(wasEscalated ? [{ role: 'system', content: 'El asesor ya atendió al cliente y le devolvió el control al bot. Continúa la conversación normalmente. NO escales de nuevo a menos que el cliente vuelva a pedirlo explícitamente.' }] : []),
+  ];
 
   let rawReply;
     try {
