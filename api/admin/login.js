@@ -4,6 +4,7 @@
 // b) New-IP alert: WhatsApp to mom on first login from unknown IP
 // c) 24h cookie expiry (down from 7 days)
 // d) Login attempt logging to KV for audit trail
+// e) Recovery: GET ?recover=TOKEN sets a session cookie without needing password
 //
 // KV access: raw Upstash REST fetch — no @vercel/kv dependency needed.
 const { timingSafeEqual, createHash } = require('crypto');
@@ -27,11 +28,11 @@ function kvCmd(cmd) {
     body: JSON.stringify(cmd),
   }).then(r => r.ok ? r.json().then(j => j.result) : null).catch(() => null);
 }
-const kvGet  = (k)         => kvCmd(['GET', k]);
-const kvSet  = (k, v, ex)  => kvCmd(ex ? ['SET', k, String(v), 'EX', String(ex)] : ['SET', k, String(v)]);
-const kvIncr = (k)         => kvCmd(['INCR', k]);
-const kvExpire = (k, s)    => kvCmd(['EXPIRE', k, String(s)]);
-const kvDel  = (k)         => kvCmd(['DEL', k]);
+const kvGet    = (k)         => kvCmd(['GET', k]);
+const kvSet    = (k, v, ex)  => kvCmd(ex ? ['SET', k, String(v), 'EX', String(ex)] : ['SET', k, String(v)]);
+const kvIncr   = (k)         => kvCmd(['INCR', k]);
+const kvExpire = (k, s)      => kvCmd(['EXPIRE', k, String(s)]);
+const kvDel    = (k)         => kvCmd(['DEL', k]);
 
 function getIp(req) {
   const fwd = req.headers['x-forwarded-for'] || '';
@@ -50,7 +51,41 @@ async function logAttempt(ip, success) {
   await kvSet(key, val, LOG_TTL).catch(() => {});
 }
 
+async function issueSessionCookie(req, res) {
+  let epoch = 0;
+  try { epoch = Number(await kvGet('session_epoch')) || 0; } catch {}
+  const exp = Date.now() + COOKIE_TTL * 1000;
+  const hmac = signToken(exp, epoch);
+  const token = exp + '.' + epoch + '.' + hmac;
+  res.setHeader('Set-Cookie', [
+    `cdp_admin=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_TTL}; Path=/`
+  ]);
+}
+
 module.exports = async function handler(req, res) {
+
+  // ── e) Recovery via GET ?recover=TOKEN ──────────────────────────────────
+  // Usage: visit https://www.capitaldepas.com/api/admin/login?recover=YOUR_TOKEN
+  // Sets a 24h session cookie and redirects to /admin.
+  // Requires ADMIN_RECOVERY_TOKEN env var set in Vercel.
+  if (req.method === 'GET') {
+    const recoveryToken = process.env.ADMIN_RECOVERY_TOKEN || '';
+    const supplied = String(req.query && req.query.recover || '');
+    if (!recoveryToken || !supplied) return res.status(400).send('Recovery not configured.');
+    const a = Buffer.from(recoveryToken.padEnd(128));
+    const b = Buffer.from(supplied.padEnd(128));
+    let match = false;
+    try { match = timingSafeEqual(a, b) && supplied === recoveryToken; } catch {}
+    if (!match) {
+      await logAttempt(getIp(req), false).catch(() => {});
+      return res.status(401).send('Invalid recovery token.');
+    }
+    await issueSessionCookie(req, res);
+    await logAttempt(getIp(req), true).catch(() => {});
+    res.setHeader('Location', '/admin');
+    return res.status(302).end();
+  }
+
   if (req.method !== 'POST') return res.status(405).end();
 
   let body = req.body;
@@ -104,14 +139,6 @@ module.exports = async function handler(req, res) {
   } catch (e) { console.error('new-ip check failed (non-fatal)', e); }
 
   // ── Build 24h cookie ──
-  let epoch = 0;
-  try { epoch = Number(await kvGet('session_epoch')) || 0; } catch {}
-  const exp = Date.now() + COOKIE_TTL * 1000;
-  const hmac = signToken(exp, epoch);
-  const token = exp + '.' + epoch + '.' + hmac;
-
-  res.setHeader('Set-Cookie', [
-    `cdp_admin=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_TTL}; Path=/`
-  ]);
+  await issueSessionCookie(req, res);
   return res.status(200).json({ ok: true });
 };
