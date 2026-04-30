@@ -7,7 +7,7 @@
 //   redditbot): HTML minimo con <title>, meta description, og:*, twitter:*,
 //   canonical, y JSON-LD (Product + BreadcrumbList).
 //
-// - Humanos: el SPA index.html completo, pero con los meta tags por defecto
+// - Humanos: el SPA index.html completo pero con los meta tags por defecto
 //   reemplazados por los del proyecto (asi el preview de Twitter/iMessage/
 //   Facebook tambien funciona si el usuario comparte la URL despues de cargar
 //   el navegador).
@@ -20,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 
 const BASE_URL = 'https://capitaldepas.com';
-const DEFAULT_OG_IMAGE = BASE_URL + '/images/og-cover.jpg';
+const DEFAULT_OG_IMAGE = BASE_URL + '/api/og-cover';
 const SITE_NAME = 'capitaldepas.com';
 
 const CRAWLER_RE = /facebookexternalhit|Twitterbot|WhatsApp|Slackbot|LinkedInBot|Discordbot|Googlebot|bingbot|Applebot|TelegramBot|Pinterestbot|redditbot|Yahoo!\s*Slurp|DuckDuckBot|Baiduspider|YandexBot|ia_archiver|SemrushBot|AhrefsBot/i;
