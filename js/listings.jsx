@@ -62,4 +62,4 @@ const Listings = ({ setPage, setSelectedProperty }) => {
       {filtered.length>0 ? ( <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:24 }}>{filtered.map(p=><PropertyCard key={p.id} prop={p} setPage={setPage} setSelectedProperty={setSelectedProperty}/>)}</div> ) : ( <div style={{ textAlign:'center', padding:'80px 0', color:'#9E9890' }}><div style={{ fontSize:48, marginBottom:16 }}>🏢</div><div style={{ fontFamily:'DM Sans', fontSize:16 }}>No encontramos proyectos con esos filtros.</div></div> )}
     </div> </div> ); };
 
-Object.assign(window, { Listings, PropertyCard });</div>
+Object.assign(window, { Listings, PropertyCard });
