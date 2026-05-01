@@ -8,7 +8,7 @@
 const SHEET_ID = '1Ynfoj4WLF2yaCfe5QN3ToywfsDNwVq2U2LvDqz4smX4';
 const urlFor = (sheetName) => 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
 
-function parseCSV(text) 
+function parseCSV(text)  {
   const rows = []; let row = [], cell = '', inQuotes = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
