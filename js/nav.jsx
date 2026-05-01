@@ -43,8 +43,8 @@ const Nav = ({ currentPage, setPage }) => {
 
   return (
     <>
-      <nav style={{ position:'fixed', top:0, left:0, right:0, zIndex:1000, padding: isMobile ? '14px 20px' : (scrolled ? '12px 56px' : '20px 56px'), display:'flex', alignItems:'center', justifyContent:'space-between', transition:'all 0.35s cubic-bezier(.23,1,.32,1)', background: navBg, backdropFilter: (scrolled||menuOpen) ? 'blur(24px)' : 'none', borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid transparent', boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.06)' : 'none' }}>
-        <CapitalDepasLogo onClick={() => setPage('home')} />
+      <nav style={{ position:'fixed', top:0, left:0, right:0, zIndex:1000, padding: isMobile ? '12px 16px' : (scrolled ? '12px 56px' : '20px 56px'), display:'flex', alignItems:'center', justifyContent:'space-between', transition:'all 0.35s cubic-bezier(.23,1,.32,1)', background: navBg, backdropFilter: (scrolled||menuOpen) ? 'blur(24px)' : 'none', borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid transparent', boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.06)' : 'none' }}>
+        <CapitalDepasLogo size={isMobile?'sm':'md'} onClick={() => setPage('home')} />
 
         {/* Desktop links */}
         {!isMobile && (
