@@ -24,10 +24,10 @@ const BUCKET_LABELS = {'cdmx':'CDMX','cancun':'Canc\u00fan','cabos':'Los Cabos',
 // ── Project hero images (keyed by project slug / id) ───────────────────────
 const PROJECT_IMAGES = {
     'palm-diamante': 'https://palmdiamante.mx/img/bg/backslide0.jpg',
-    'breta\u00f1a-92': 'https://www.tudepa.com/devs/bretana-90/fachada-1.jpg',
-    'bretana-92': 'https://www.tudepa.com/devs/bretana-90/fachada-1.jpg',
+    'breta\u00f1a-92': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=70',
+    'bretana-92': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=70',
     'nao-living': 'https://www.naoliving.mx/images/content/naoliving-fachada.webp',
-    'oasis-churubusco': 'https://www.tudepa.com/devs/oasis-churubusco/0-fachada-1_edit-8.jpg',
+    'oasis-churubusco': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop&q=70',
     'live-aqua': 'https://liveaquaacapulco.com/images/full-width-images/slide1-min.jpg',
 };
 
