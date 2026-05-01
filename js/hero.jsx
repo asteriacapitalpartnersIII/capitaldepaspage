@@ -19,9 +19,15 @@ const FloatingCard = ({ prop, style, parallaxFactor }) => {
   return (
     <div ref={ref} style={{ position:'absolute', ...style, background:'#fff', border:'1px solid rgba(0,0,0,0.07)', borderRadius:16, padding:'14px 18px', backdropFilter:'blur(16px)', boxShadow:'0 20px 60px rgba(0,0,0,0.12)', minWidth:200, transition:'transform 0.06s linear', pointerEvents:'none', zIndex:2 }}>
       <div style={{ width:'100%', height:80, borderRadius:8, marginBottom:10, background:`linear-gradient(135deg,hsl(${prop.accentHue},60%,88%),hsl(${prop.accentHue},45%,78%))`, position:'relative', overflow:'hidden' }}>
-        {Array.from({length:3}).map((_,r)=>Array.from({length:4}).map((_,c)=>(
-          <div key={`${r}${c}`} style={{ position:'absolute', width:8, height:10, borderRadius:1, background:`hsla(${prop.accentHue},50%,30%,${Math.random()>0.4?0.4:0.1})`, left:10+c*18, top:8+r*22 }} />
-        )))}
+        {(typeof PROJECT_IMAGES !== 'undefined' && (PROJECT_IMAGES[prop.slug] || PROJECT_IMAGES[prop.id])) ? (
+          <img src={PROJECT_IMAGES[prop.slug] || PROJECT_IMAGES[prop.id]} alt={prop.name}
+            onError={e => e.target.style.display='none'}
+            style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />
+        ) : (
+          Array.from({length:3}).map((_,r)=>Array.from({length:4}).map((_,c)=>(
+            <div key={`${r}${c}`} style={{ position:'absolute', width:8, height:10, borderRadius:1, background:`hsla(${prop.accentHue},50%,30%,${Math.random()>0.4?0.4:0.1})`, left:10+c*18, top:8+r*22 }} />
+          )))
+        )}
       </div>
       <div style={{ fontFamily:'DM Sans', fontSize:13, fontWeight:600, color:'#0E0E0C' }}>{prop.name}</div>
       <div style={{ fontFamily:'DM Sans', fontSize:11, color:'#9E9890', marginTop:2 }}>{prop.location}</div>
