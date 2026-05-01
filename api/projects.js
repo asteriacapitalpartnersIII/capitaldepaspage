@@ -8,7 +8,7 @@
 const SHEET_ID = '1Ynfoj4WLF2yaCfe5QN3ToywfsDNwVq2U2LvDqz4smX4';
 const urlFor = (sheetName) => 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&sheet=' + encodeURIComponent(sheetName);
 
-function parseCSV(text) {
+function parseCSV(text) 
   const rows = []; let row = [], cell = '', inQuotes = false;
   for (let i = 0; i < text.length; i++) {
     const ch = text[i];
@@ -59,7 +59,7 @@ const resolvePhoto = (p) => {
 };
 
 function rowToProject(headers, row) {
-  const get = (name) => { const idx = headers.indexOf(name); return idx >= 0 ? (row[idx] || '').trim() : ''; };
+  const get = (name) => { const idx = headers.findIndex(h => h.toLowerCase() === name.toLowerCase()); return idx >= 0 ? (row[idx] || '').trim() : ''; };
   const slug = get('slug'); if (!slug) return null;
   const price = toNumber(get('precio'));
   const priceStr = get('precio_texto') || (price ? '$' + (price/1e6).toFixed(1) + 'M' : '');
@@ -86,7 +86,7 @@ function rowToProject(headers, row) {
 }
 
 function rowToPost(headers, row) {
-  const get = (name) => { const idx = headers.indexOf(name); return idx >= 0 ? (row[idx] || '').trim() : ''; };
+  const get = (name) => { const idx = headers.findIndex(h => h.toLowerCase() === name.toLowerCase()); return idx >= 0 ? (row[idx] || '').trim() : ''; };
   const slug = get('slug'); if (!slug) return null;
   return {
     id: slug, slug, title: get('titulo'),
