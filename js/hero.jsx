@@ -65,8 +65,8 @@ const HeroCinematic = ({ setPage, searchQuery, setSearchQuery, searchType, setSe
         {particles.map(p=>(<circle key={p.id} cx={`${p.x}%`} cy={`${p.y}%`} r={p.size} fill="#1550E8" opacity={p.opacity}><animate attributeName="cy" values={`${p.y}%;${p.y-6}%;${p.y}%`} dur={`${p.dur}s`} begin={`${p.delay}s`} repeatCount="indefinite"/><animate attributeName="opacity" values={`${p.opacity};${p.opacity*0.3};${p.opacity}`} dur={`${p.dur}s`} begin={`${p.delay}s`} repeatCount="indefinite"/></circle>))}
       </svg>
       {!mobile && <><FloatingCard prop={PROPERTIES[0]} style={{ right:'26%', top:'14%' }} parallaxFactor={0.035} /><FloatingCard prop={PROPERTIES[3]} style={{ right:'6%', top:'32%' }} parallaxFactor={0.055} /><FloatingCard prop={PROPERTIES[4]} style={{ right:'20%', bottom:'16%' }} parallaxFactor={0.025} /></>}
-      <div style={{ position:'relative', zIndex:3, maxWidth:mobile?'100%':660, padding:mobile?'100px 24px 60px':'0 80px', marginTop:mobile?0:60, width:'100%' }}>
-        <h1 style={{ fontFamily:'Playfair Display', fontSize:mobile?48:72, fontWeight:700, lineHeight:1.05, margin:'0 0 8px' }}>
+      <div style={{ position:'relative', zIndex:3, maxWidth:mobile?'100%':660, padding:mobile?'90px 20px 60px':'0 80px', marginTop:mobile?0:60, width:'100%' }}>
+        <h1 style={{ fontFamily:'Playfair Display', fontSize:'clamp(32px,11vw,72px)', fontWeight:700, lineHeight:1.05, margin:'0 0 8px' }}>
           <span style={{ color:'#0E0E0C', display:'block', letterSpacing:-1 }}>{scrambled}</span>
           <span style={{ background:'linear-gradient(90deg,#1550E8,#5B8EF5,#1550E8)', backgroundSize:'200%', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', display:'block', letterSpacing:-2, animation:'shimmer 3s linear infinite' }}>depa ideal.</span>
         </h1>
@@ -105,7 +105,7 @@ const HeroGrid = ({ setPage }) => {
         <div style={{ position:'absolute', right:0, top:0, width:'52%', height:'100%', background:'linear-gradient(to right,#F5F3EE 0%,transparent 40%)', pointerEvents:'none', zIndex:1 }} />
       </>)}
       <div style={{ position:'relative', zIndex:2, display:'flex', flexDirection:'column', justifyContent:'center', padding:mobile?'100px 24px 60px':'0 80px', background:'#F5F3EE' }}>
-        <h1 style={{ fontFamily:'Playfair Display', fontSize:mobile?44:60, fontWeight:700, lineHeight:1.08, margin:'0 0 18px' }}>
+        <h1 style={{ fontFamily:'Playfair Display', fontSize:'clamp(32px,9vw,60px)', fontWeight:700, lineHeight:1.08, margin:'0 0 18px' }}>
           <span style={{ color:'#0E0E0C', display:'block' }}>Los mejores</span>
           <span style={{ color:'#1550E8', display:'block' }}>departamentos</span>
           <span style={{ color:'#0E0E0C', display:'block' }}>en un solo lugar.</span>
@@ -136,7 +136,7 @@ const HeroEditorial = ({ setPage }) => {
       </div>
       <div style={{ position:'relative', zIndex:2, padding:mobile?'100px 24px 60px':'0 40px' }}>
         <div style={{ fontFamily:'DM Sans', fontSize:12, letterSpacing:6, color:'rgba(21,80,232,0.5)', textTransform:'uppercase', marginBottom:28 }}>capitaldepas.com — México</div>
-        <div style={{ fontFamily:'Playfair Display', fontSize:mobile?56:110, fontWeight:700, lineHeight:0.88, letterSpacing:-4, marginBottom:8 }}>
+        <div style={{ fontFamily:'Playfair Display', fontSize:'clamp(40px,16vw,110px)', fontWeight:700, lineHeight:0.88, letterSpacing:-4, marginBottom:8 }}>
           <div style={{ color:'#0E0E0C', opacity:0.07 }}>INVIERTE</div>
           <div style={{ background:'linear-gradient(90deg,#1550E8,#5B8EF5,#1550E8)', backgroundSize:'200%', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', animation:'shimmer 3s linear infinite', minHeight:mobile?80:120, display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.5s ease' }}>{lines[line]}</div>
           <div style={{ color:'#0E0E0C', opacity:0.07 }}>EN MÉXICO</div>
