@@ -3,8 +3,8 @@
 const ZONE_BUCKETS = {
     'cdmx':'cdmx','polanco':'cdmx','reforma':'cdmx','reforma centro':'cdmx','condesa':'cdmx','roma':'cdmx',
     'santa fe':'cdmx','narvarte':'cdmx','del valle':'cdmx','zona oriente':'cdmx',
-    'granjas mexico':'cdmx','granjas m\u00e9xico':'cdmx','iztapalapa':'cdmx','iztacalco':'cdmx',
-    'benito juarez':'cdmx','benito ju\u00e1rez':'cdmx','miguel hidalgo':'cdmx','cuauhtemoc':'cdmx','cuauht\u00e9moc':'cdmx',
+    'granjas mexico':'cdmx','granjas méxico':'cdmx','iztapalapa':'cdmx','iztacalco':'cdmx',
+    'benito juarez':'cdmx','benito juárez':'cdmx','miguel hidalgo':'cdmx','cuauhtemoc':'cdmx','cuauht\u00e9moc':'cdmx',
     'cancun':'cancun','canc\u00fan':'cancun','zona hotelera':'cancun','playa del carmen':'cancun','tulum':'cancun',
     'los cabos':'cabos','los-cabos':'cabos','cabo san lucas':'cabos','san jose del cabo':'cabos','san jos\u00e9 del cabo':'cabos',
     'guadalajara':'guadalajara','zapopan':'guadalajara','tlaquepaque':'guadalajara',
@@ -19,15 +19,15 @@ function zoneToFilter(zone) {
     return ZONE_BUCKETS[zone.toLowerCase().trim()] || null;
 }
 
-const BUCKET_LABELS = {'cdmx':'CDMX','cancun':'Canc\u00fan','cabos':'Los Cabos','guadalajara':'Guadalajara','monterrey':'Monterrey','oaxaca':'Oaxaca','acapulco':'Acapulco','vallarta':'Vallarta'};
+const BUCKET_LABELS = {'cdmx':'CDMX','cancun':'Cancún','cabos':'Los Cabos','guadalajara':'Guadalajara','monterrey':'Monterrey','oaxaca':'Oaxaca','acapulco':'Acapulco','vallarta':'Vallarta'};
 
 // ── Project hero images (keyed by project slug / id) ───────────────────────
 const PROJECT_IMAGES = {
     'palm-diamante': 'https://palmdiamante.mx/img/bg/backslide0.jpg',
-    'breta\u00f1a-92': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=70',
-    'bretana-92': 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&auto=format&fit=crop&q=70',
+    'breta\u00f1a-92': 'https://www.tudepa.com/devs/bretana-90/fachada-1.jpg',
+    'bretana-92': 'https://www.tudepa.com/devs/bretana-90/fachada-1.jpg',
     'nao-living': 'https://www.naoliving.mx/images/content/naoliving-fachada.webp',
-    'oasis-churubusco': 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop&q=70',
+    'oasis-churubusco': 'https://www.tudepa.com/devs/oasis-churubusco/0-fachada-1_edit-8.jpg',
     'live-aqua': 'https://liveaquaacapulco.com/images/full-width-images/slide1-min.jpg',
 };
 
@@ -94,7 +94,7 @@ const PropertyCard = ({ prop, setPage, setSelectedProperty }) => {
                 background:'linear-gradient(to top,rgba(0,0,0,0.4),transparent)',
                 opacity:hovered?1:0.3, transition:'opacity 0.3s',
                 display:'flex', alignItems:'flex-end', justifyContent:'center', paddingBottom:16
-            }}>{hovered && <span style={{ fontFamily:'DM Sans', fontSize:12, color:'#fff', letterSpacing:2, textTransform:'uppercase', fontWeight:700 }}>Ver proyecto \u2192</span>}</div>
+            }}>{hovered && <span style={{ fontFamily:'DM Sans', fontSize:12, color:'#fff', letterSpacing:2, textTransform:'uppercase', fontWeight:700 }}>Ver proyecto →</span>}</div>
         </div>
         <div style={{ padding:'18px 20px 20px' }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
@@ -108,7 +108,7 @@ const PropertyCard = ({ prop, setPage, setSelectedProperty }) => {
                 <div style={{ fontFamily:'DM Sans', fontSize:20, fontWeight:800, color:'#1550E8' }}>{prop.priceStr}</div>
             </div>
             <div style={{ display:'flex', gap:16, margin:'12px 0', paddingTop:12, borderTop:'1px solid rgba(0,0,0,0.05)' }}>
-                {[{icon:'\ud83d\udecf',val:`${prop.beds} rec.`},{icon:'\ud83d\udebf',val:`${prop.baths} ba\u00f1os`},{icon:'\ud83d\udccf',val:`${prop.sqm} m\u00b2`}].map(item=>(
+                {[{icon:'\ud83d\udecf',val:`${prop.beds} rec.`},{icon:'\ud83d\udebf',val:`${prop.baths} baños`},{icon:'\ud83d\udccf',val:`${prop.sqm} m²`}].map(item=>(
                     <div key={item.val} style={{ fontFamily:'DM Sans', fontSize:12, color:'#6B6560', display:'flex', alignItems:'center', gap:5 }}>
                         <span style={{fontSize:13}}>{item.icon}</span>{item.val}
                     </div>
@@ -178,7 +178,7 @@ const Listings = ({ setPage, setSelectedProperty }) => {
                 <div style={{ marginBottom:44 }}>
                     <div style={{ fontFamily:'DM Sans', fontSize:12, letterSpacing:4, color:'rgba(21,80,232,0.6)', textTransform:'uppercase', marginBottom:10 }}>Marketplace</div>
                     <h2 style={{ fontFamily:'Playfair Display', fontSize:52, fontWeight:700, color:'#0E0E0C', margin:0, letterSpacing:-1 }}>Encuentra tu <span style={{ color:'#1550E8' }}>departamento</span></h2>
-                    <p style={{ fontFamily:'DM Sans', fontSize:16, color:'#9E9890', marginTop:10 }}>{PROPERTIES.length} proyectos disponibles en M\u00e9xico</p>
+                    <p style={{ fontFamily:'DM Sans', fontSize:16, color:'#9E9890', marginTop:10 }}>{PROPERTIES.length} proyectos disponibles en México</p>
                 </div>
 
                 <div style={{ display:'flex', flexWrap:'wrap', gap:10, marginBottom:28, alignItems:'center' }}>
