@@ -35,7 +35,7 @@ const Nav = ({ currentPage, setPage }) => {
     { label:'Proyectos', page:'listings' },
     { label:'Mapa', page:'map' },
     { label:'Blog', page:'blog' },
-    { label:'Calculadora', page:'calculator' },
+    { label:'Calculadora de Hipoteca', page:'calculator' },
     { label:'Contacto', page:'contact' },
   ];
 
